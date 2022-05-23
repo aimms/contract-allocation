@@ -1,0 +1,4 @@
+/*Change color of togglelegend of the combination chart*/
+.togglelegend-button svg{
+  fill: var(--primaryDark);
+}

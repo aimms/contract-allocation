@@ -1,0 +1,9 @@
+/*Add logo on the background*/
+.scroll-wrapper--pagev2 .page-container {
+  content: " ";
+  background: url(img/LeftBackground.png) rgb(249, 249, 249) no-repeat right/contain;
+
+}
+
+
+

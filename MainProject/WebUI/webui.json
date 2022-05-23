@@ -1,0 +1,566 @@
+{
+  "version": "4.67.0",
+  "application": {
+    "aimms.widget.type": {
+      "literal": "application"
+    },
+    "browsername": {
+      "aimms": {
+        "contents": [
+          "webui::ClientBrowserName"
+        ]
+      }
+    },
+    "browsertimezone": {
+      "aimms": {
+        "contents": [
+          "webui::BrowserTimeZone"
+        ]
+      }
+    },
+    "ignoredst": {
+      "aimms": {
+        "contents": [
+          "webui::IgnoreDST"
+        ]
+      }
+    },
+    "pages": {
+      "literal": {
+        "name": "root",
+        "slug": "root",
+        "children": [
+          {
+            "name": "Main Project",
+            "slug": "main_project",
+            "children": [
+              {
+                "name": "home",
+                "slug": "home",
+                "type": "pagev2-grid",
+                "children": []
+              },
+              {
+                "name": "Problem Description",
+                "type": "pagev2-grid",
+                "slug": "problem_description",
+                "children": []
+              },
+              {
+                "name": "Inputs",
+                "type": "pagev2-grid",
+                "slug": "inputs",
+                "children": []
+              },
+              {
+                "name": "Results",
+                "type": "pagev2-grid",
+                "slug": "results",
+                "children": []
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "theme.classic": {
+      "literal": "NOT_ALLOWED"
+    },
+    "timezone": {
+      "aimms": {
+        "contents": [
+          "webui::DisplayTimeZone"
+        ]
+      }
+    },
+    "timezone.dst.readonly": {
+      "aimms": {
+        "contents": [
+          "webui::DefaultDSTSettingForDisplayTimeZone"
+        ]
+      }
+    },
+    "workflows.configuration": {
+      "aimms": {
+        "contents": [
+          "sp_myWorkflowSteps"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_myWorkflowSteps",
+            "slice": [
+              {
+                "index": "webui::indexWorkflowOrder",
+                "type": "free",
+                "value": "webui::indexWorkflowOrder"
+              },
+              {
+                "index": "webui::indexNoOfPages",
+                "type": "free",
+                "value": "webui::indexNoOfPages"
+              },
+              {
+                "index": "webui::indexWorkflowPageSpec",
+                "type": "free",
+                "value": "webui::indexWorkflowPageSpec"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "workflows.information": {
+      "aimms": {
+        "contents": [
+          "sp_myWorkflows"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_myWorkflows",
+            "slice": [
+              {
+                "index": "webui::indexWorkflowOrder",
+                "type": "free",
+                "value": "webui::indexWorkflowOrder"
+              },
+              {
+                "index": "webui::indexWorkflowSpec",
+                "type": "free",
+                "value": "webui::indexWorkflowSpec"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "layouts/custom_234161e0-a7c2-477f-b278-101c9e62d5e4": {
+    "definition": {
+      "literal": {
+        "componentName": "Grid",
+        "props": {
+          "gridTemplateColumns": "1fr",
+          "gridTemplateRows": "1fr 0.1fr 1fr",
+          "gridTemplateAreas": "\"area-a\" \"area-b\" \"area-c\""
+        },
+        "items": [
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-a",
+              "name": "Area A",
+              "gridAutoFlow": "column"
+            }
+          },
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-b",
+              "name": "Area B",
+              "gridAutoFlow": "column"
+            }
+          },
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-c",
+              "name": "Area C",
+              "gridAutoFlow": "row"
+            }
+          }
+        ]
+      }
+    },
+    "displayName": {
+      "literal": "Layout1 Copy"
+    }
+  },
+  "pages/home": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid"
+    },
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "txt_homeText",
+          "gridArea": "area-a",
+          "dndId": "area-atxt_homeText1"
+        },
+        {
+          "widgetUri": "img_homeLogo",
+          "gridArea": "area-a",
+          "dndId": "Unassigned widgetsimg_homeLogo0"
+        }
+      ]
+    },
+    "layoutId": {
+      "literal": "Layout11"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "img_homeLogo",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
+  "pages/inputs": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid"
+    },
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "cbc_generation",
+          "gridArea": "area-c",
+          "dndId": "area-bcbc_generation4"
+        },
+        {
+          "widgetUri": "tbl_producersInformation",
+          "gridArea": "area-a",
+          "dndId": "area-atbl_producersInformation0"
+        },
+        {
+          "widgetUri": "tbl_contractsInformation",
+          "gridArea": "area-a",
+          "dndId": "area-atbl_contractsInformation1"
+        },
+        {
+          "widgetUri": "btn_solveProblem",
+          "gridArea": "area-b",
+          "dndId": "area-bbtn_solveProblem2"
+        },
+        {
+          "widgetUri": "scl_totalCost",
+          "gridArea": "area-b",
+          "dndId": "area-bscl_totalCost3"
+        }
+      ]
+    },
+    "layoutId": {
+      "literal": "custom_234161e0-a7c2-477f-b278-101c9e62d5e4"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "cbc_generation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "tbl_producersInformation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "tbl_contractsInformation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "btn_solveProblem",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "scl_totalCost",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
+  "pages/problem_description": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid"
+    },
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "txt_homeText",
+          "gridArea": "area-a",
+          "dndId": "Unassigned widgetstxt_homeText0"
+        }
+      ]
+    },
+    "layoutId": {
+      "literal": "Layout11"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "txt_homeText",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
+  "pages/results": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid"
+    },
+    "bindings": {
+      "literal": []
+    },
+    "layoutId": {
+      "literal": "Layout1"
+    },
+    "widgets": {
+      "literal": []
+    }
+  },
+  "widgets/btn_solveProblem": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "MainExecution"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "btn_solveProblem"
+    },
+    "title": {
+      "literal": "Solve Problem"
+    }
+  },
+  "widgets/cbc_generation": {
+    "aimms.widget.type": {
+      "literal": "combinationchart"
+    },
+    "contents.__display_order__": {
+      "literal": [
+        "contents.0"
+      ]
+    },
+    "contents.0.identifier": {
+      "literal": {
+        "identifier": "v_generation",
+        "slice": [
+          {
+            "index": "i_p",
+            "type": "free",
+            "value": "i_p"
+          },
+          {
+            "index": "i_c",
+            "type": "free",
+            "value": "i_c"
+          }
+        ]
+      }
+    },
+    "contents.0.numdecimals": {
+      "literal": 0
+    },
+    "contents.partition": {
+      "literal": {
+        "header": [
+          "i_c"
+        ],
+        "grouped": [],
+        "stacked": [
+          "i_p"
+        ],
+        "aggregated": [
+          "<IDENTIFIER-SET>"
+        ]
+      }
+    },
+    "contents.show.units": {
+      "literal": true
+    },
+    "data.interpolate": {
+      "literal": false
+    },
+    "data.labels.show": {
+      "literal": true
+    },
+    "indices.__display_order__": {
+      "literal": [
+        "indices.0"
+      ]
+    },
+    "indices.0.index": {
+      "literal": "i_p"
+    },
+    "indices.0.storefocus": {
+      "literal": {
+        "identifier": "ep_actualProducer"
+      }
+    },
+    "legend.show": {
+      "literal": true
+    },
+    "name": {
+      "literal": "cbc_generation"
+    },
+    "title": {
+      "literal": "Contract Alocation"
+    }
+  },
+  "widgets/img_homeLogo": {
+    "aimms.widget.type": {
+      "literal": "image"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "sp_logo"
+        ]
+      }
+    },
+    "name": {
+      "literal": "img_homeLogo"
+    }
+  },
+  "widgets/scl_totalCost": {
+    "aimms.widget.type": {
+      "literal": "scalar"
+    },
+    "compact": {
+      "literal": 1
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "v_totalCost"
+        ]
+      }
+    },
+    "name": {
+      "literal": "scl_totalCost"
+    }
+  },
+  "widgets/tbl_contractsInformation": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "p_minimalNumberofContributors",
+          "p_contractSize"
+        ]
+      }
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "i_c"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_contractSize"
+          },
+          "width": 20.59
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_minimalNumberofContributors"
+          },
+          "width": 33.77
+        }
+      ]
+    },
+    "name": {
+      "literal": "tbl_contractsInformation"
+    },
+    "title": {
+      "literal": "Contract Information"
+    }
+  },
+  "widgets/tbl_producersInformation": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "p_minimalDelivery",
+          "p_availableCapacity"
+        ]
+      }
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "i_p"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_minimalDelivery"
+          },
+          "width": 22.64
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_availableCapacity"
+          },
+          "width": 23.76
+        }
+      ]
+    },
+    "name": {
+      "literal": "tbl_producersInformation"
+    },
+    "title": {
+      "literal": "Producers Information"
+    }
+  },
+  "widgets/txt_homeText": {
+    "aimms.widget.type": {
+      "literal": "text"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "sp_problemDescription"
+        ],
+        "slices": []
+      }
+    },
+    "name": {
+      "literal": "txt_homeText"
+    }
+  }
+}

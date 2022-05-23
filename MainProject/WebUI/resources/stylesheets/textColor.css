@@ -1,0 +1,15 @@
+/*Change table text color*/
+.tag-table .grid-viewport .cell:not(.flag-readOnly), 
+html:not(.using-touch) .tag-table .grid-viewport .cell:not(.flag-readOnly) {
+  color: var(--primaryDark);
+}
+
+/*Change scalar text color*/
+.tag-scalar .kpi .value {
+  color: var(--primaryDark);
+}
+
+/*Change slider text color*/
+.tag-slider .slider-value {
+  color: var(--primaryDark);
+}
