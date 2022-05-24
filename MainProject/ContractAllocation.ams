@@ -2,6 +2,30 @@
 
 Model Main_CarSelection {
 	Section Data_Model {
+		Section Quantities_and_Units {
+			Comment: {
+				"This section contains all the units and quantities that are added automatically by AIMMS.
+				It is recommended to declare all your quantities here."
+			}
+			Quantity SI_Time_Duration {
+				BaseUnit: s;
+				Conversions: minute->s : #-># * 60;
+				Comment: {
+					"Expresses the value for the duration of periods.
+					
+					The unit s has been added automatically because it is a required unit for AimmsWebUI.
+					
+					The unit minute has been added automatically because it is a required unit for AimmsWebUI."
+				}
+			}
+			Quantity SI_Mass {
+				BaseUnit: kg;
+				Comment: "Expresses the value for the amount of matter.";
+			}
+			Quantity q_monetary {
+				BaseUnit: $;
+			}
+		}
 		Section Inputs {
 			Set s_producers {
 				Text: "The set of all producers";
@@ -15,18 +39,22 @@ Model Main_CarSelection {
 			Parameter p_availableCapacity {
 				IndexDomain: (i_p);
 				Text: "Available capacity for producer p";
+				Unit: kg;
 			}
 			Parameter p_productionCost {
 				IndexDomain: (i_p,i_c);
 				Text: "Unit cost for delivery by producer p for contract c";
+				Unit: $/kg;
 			}
 			Parameter p_minimalDelivery {
 				IndexDomain: (i_p);
 				Text: "Minimal delivery size for producer p";
+				Unit: kg;
 			}
 			Parameter p_contractSize {
 				IndexDomain: (i_c);
 				Text: "Size of contract c";
+				Unit: kg;
 			}
 			Parameter p_minimalNumberofContributors {
 				IndexDomain: (i_c);
@@ -37,12 +65,14 @@ Model Main_CarSelection {
 		Section Math_Model {
 			Variable v_totalCost {
 				Text: "Total cost of all deliveries";
-				Definition: sum( (i_p,i_c), p_productionCost(i_p,i_c)*v_generation(i_p,i_c));
+				Unit: $;
+				Definition: sum((i_p,i_c), p_productionCost(i_p,i_c) * v_generation(i_p,i_c));
 			}
 			Variable v_generation {
 				IndexDomain: (i_p,i_c);
 				Text: "Amount of commodity delivered by producers p for contract c";
 				Range: [p_minimalDelivery(i_p), 10000);
+				Unit: kg;
 				Property: SemiContinuous;
 			}
 			Variable v_generationIncidence {
@@ -53,22 +83,25 @@ Model Main_CarSelection {
 			Constraint c_capacity {
 				IndexDomain: (i_p);
 				Text: "Production capacity for producer p";
-				Definition: sum( i_c, v_generation(i_p,i_c)) <= p_availableCapacity(i_p);
+				Unit: kg;
+				Definition: sum(i_c, v_generation(i_p,i_c)) <= p_availableCapacity(i_p);
 			}
 			Constraint c_contractFullfillment {
 				IndexDomain: (i_c);
 				Text: "The demand for contract c is met";
-				Definition: sum ( i_p, v_generation(i_p,i_c)) >= p_contractSize(i_c);
+				Unit: kg;
+				Definition: sum(i_p, v_generation(i_p,i_c)) >= p_contractSize(i_c);
 			}
 			Constraint c_contractContribution {
 				IndexDomain: (i_c);
 				Text: "Mimimal number of contributors to contract c";
-				Definition: sum( i_p, v_generationIncidence(i_p,i_c)) >= p_minimalNumberofContributors(i_c);
+				Definition: sum(i_p, v_generationIncidence(i_p,i_c)) >= p_minimalNumberofContributors(i_c);
 			}
 			Constraint c_generationIncidenceDetermination {
 				IndexDomain: (i_p,i_c);
 				Text: "Determine if producer p delivers to contract c";
-				Definition: v_generation(i_p,i_c) >= p_minimalDelivery(i_p)*v_generationIncidence(i_p,i_c);
+				Unit: kg;
+				Definition: v_generation(i_p,i_c) >= p_minimalDelivery(i_p) * v_generationIncidence(i_p,i_c);
 			}
 			MathematicalProgram mp_contractAllocation {
 				Objective: v_totalCost;
@@ -103,9 +136,9 @@ Model Main_CarSelection {
 			Text: "Display message in color, based on the amount of generation in relation to the bounds";
 			Range: AllColors;
 			Definition: {
-				if sum( i_c1, v_generation(i_p,i_c1) ) = p_availableCapacity(i_p) and  v_generation(i_p,i_c) = p_minimalDelivery(i_p) then
+				if sum(i_c1, v_generation(i_p,i_c1)) = p_availableCapacity(i_p) and v_generation(i_p,i_c) = p_minimalDelivery(i_p) then
 					    'red'
-				elseif  sum( i_c1, v_generation(i_p,i_c1) ) = p_availableCapacity(i_p) then
+				elseif  sum(i_c1, v_generation(i_p,i_c1)) = p_availableCapacity(i_p) then
 					    'magenta'
 				elseif  v_generation(i_p,i_c) = p_minimalDelivery(i_p) then
 					    'blue'
@@ -160,18 +193,18 @@ Model Main_CarSelection {
 					  ( 1, 1, pageId            ) : "home"               ,  ( 1, 1, tooltip           ) : "Problem Description",
 					  ( 1, 1, workflowPageState ) : "Active"             ,  ( 1, 1, pageDataState     ) : "Incomplete"         ,
 					  ( 1, 1, redirectPageId    ) : "home"               ,  ( 1, 2, displayText       ) : "Problem Description",
-					  ( 1, 2, icon              ) : "aimms-happy"        ,  ( 1, 2, pageId            ) : "problem_description",
+					  ( 1, 2, icon              ) : "aimms-lamp5"        ,  ( 1, 2, pageId            ) : "problem_description",
 					  ( 1, 2, tooltip           ) : "Problem Description",  ( 1, 2, workflowPageState ) : "Active"             ,
 					  ( 1, 2, pageDataState     ) : "Incomplete"         ,  ( 1, 2, redirectPageId    ) : "home"               ,
-					  ( 1, 3, displayText       ) : "Demo Page"          ,  ( 1, 3, icon              ) : "aimms-happy"        ,
+					  ( 1, 3, displayText       ) : "Demo Page"          ,  ( 1, 3, icon              ) : "aimms-equalizer2"   ,
 					  ( 1, 3, pageId            ) : "inputs"             ,  ( 1, 3, tooltip           ) : "Demo Page"          ,
 					  ( 1, 3, workflowPageState ) : "Active"             ,  ( 1, 3, pageDataState     ) : "Incomplete"         ,
-					  ( 1, 3, redirectPageId    ) : "home"               ,  ( 1, 4, displayText       ) : "Production Cost"    ,
-					  ( 1, 4, icon              ) : "aimms-happy"        ,  ( 1, 4, pageId            ) : "results"            ,
-					  ( 1, 4, tooltip           ) : "Production Cost"    ,  ( 1, 4, workflowPageState ) : "Active"             ,
-					  ( 1, 4, pageDataState     ) : "Incomplete"         ,  ( 1, 4, redirectPageId    ) : "home"                }
+					  ( 1, 3, redirectPageId    ) : "home"                }
 				}
 			}
+		}
+		Section SidePanel {
+			DeclarationSection DemoPage;
 		}
 		Section FlagsIdentifier {
 			StringParameter sp_readOnlyFlag {
@@ -217,23 +250,6 @@ Model Main_CarSelection {
 			Return 1 to allow the termination sequence to continue.
 			Return 0 if you want to cancel the termination sequence.
 			It is recommended to only use the procedure PreMainTermination to cancel the termination sequence and let this procedure always return 1."
-		}
-	}
-	Section Quantities_and_Units {
-		Comment: {
-			"This section contains all the units and quantities that are added automatically by AIMMS.
-			It is recommended to declare all your quantities here."
-		}
-		Quantity SI_Time_Duration {
-			BaseUnit: s;
-			Conversions: minute->s : #-># * 60;
-			Comment: {
-				"Expresses the value for the duration of periods.
-				
-				The unit s has been added automatically because it is a required unit for AimmsWebUI.
-				
-				The unit minute has been added automatically because it is a required unit for AimmsWebUI."
-			}
 		}
 	}
 }
