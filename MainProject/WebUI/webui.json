@@ -50,7 +50,14 @@
                 "name": "Demo Page",
                 "type": "pagev2-grid",
                 "slug": "inputs",
-                "children": []
+                "children": [
+                  {
+                    "name": "Informations",
+                    "type": "pagev2-grid-sidepanel",
+                    "slug": "informations",
+                    "children": []
+                  }
+                ]
               }
             ]
           }
@@ -274,6 +281,34 @@
       ]
     }
   },
+  "pages/informations": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid-sidepanel"
+    },
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "lst_information",
+          "gridArea": "area-a",
+          "dndId": "Unassigned widgetslst_information1"
+        }
+      ]
+    },
+    "layoutId": {
+      "literal": "Layout11"
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "lst_information",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
   "pages/inputs": {
     "aimms.widget.type": {
       "literal": "pagev2-grid"
@@ -314,6 +349,30 @@
     },
     "layoutId": {
       "literal": "custom_234161e0-a7c2-477f-b278-101c9e62d5e4"
+    },
+    "sidepanels": {
+      "aimms": {
+        "contents": [
+          "sp_demoPageSidePanel"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_demoPageSidePanel",
+            "slice": [
+              {
+                "index": "webui::indexPageExtension",
+                "type": "free",
+                "value": "webui::indexPageExtension"
+              },
+              {
+                "index": "webui::indexSidePanelSpec",
+                "type": "free",
+                "value": "webui::indexSidePanelSpec"
+              }
+            ]
+          }
+        ]
+      }
     },
     "widgets": {
       "literal": [
@@ -461,7 +520,8 @@
     },
     "indices.__display_order__": {
       "literal": [
-        "indices.0"
+        "indices.0",
+        "indices.1"
       ]
     },
     "indices.0.index": {
@@ -470,6 +530,14 @@
     "indices.0.storefocus": {
       "literal": {
         "identifier": "ep_actualProducer"
+      }
+    },
+    "indices.1.index": {
+      "literal": "i_c"
+    },
+    "indices.1.storefocus": {
+      "literal": {
+        "identifier": "ep_actualContract"
       }
     },
     "legend.show": {
@@ -495,6 +563,67 @@
     },
     "name": {
       "literal": "img_homeLogo"
+    }
+  },
+  "widgets/lst_information": {
+    "aimms.widget.type": {
+      "literal": "list"
+    },
+    "list.items.specification": {
+      "aimms": {
+        "contents": [
+          "sp_myListGroupItems"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_myListGroupItems",
+            "slice": [
+              {
+                "index": "webui::indexListGroupOrder",
+                "type": "free",
+                "value": "webui::indexListGroupOrder"
+              },
+              {
+                "index": "webui::indexNoOfListItems",
+                "type": "free",
+                "value": "webui::indexNoOfListItems"
+              },
+              {
+                "index": "webui::indexListGroupItemsSpec",
+                "type": "free",
+                "value": "webui::indexListGroupItemsSpec"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "list.specification": {
+      "aimms": {
+        "contents": [
+          "sp_myListsGroups"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_myListsGroups",
+            "slice": [
+              {
+                "index": "webui::indexListGroupOrder",
+                "type": "free",
+                "value": "webui::indexListGroupOrder"
+              },
+              {
+                "index": "webui::indexListGroupSpec",
+                "type": "free",
+                "value": "webui::indexListGroupSpec"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "name": {
+      "literal": "lst_information"
     }
   },
   "widgets/scl_problemDescription": {
@@ -551,16 +680,16 @@
         {
           "type": "colHeader",
           "colKey": {
-            "<IDENTIFIER-SET>": "p_contractSize"
+            "<IDENTIFIER-SET>": "p_minimalNumberofContributors"
           },
-          "width": 17.13
+          "width": 20.19
         },
         {
           "type": "colHeader",
           "colKey": {
-            "<IDENTIFIER-SET>": "p_minimalNumberofContributors"
+            "<IDENTIFIER-SET>": "p_contractSize"
           },
-          "width": 20.35
+          "width": 18.01
         }
       ]
     },
@@ -604,14 +733,14 @@
           "colKey": {
             "<IDENTIFIER-SET>": "p_minimalDelivery"
           },
-          "width": 22.64
+          "width": 21.37
         },
         {
           "type": "colHeader",
           "colKey": {
             "<IDENTIFIER-SET>": "p_availableCapacity"
           },
-          "width": 23.76
+          "width": 22.37
         }
       ]
     },
@@ -663,37 +792,37 @@
         {
           "type": "colHeader",
           "colKey": {
-            "i_p": "Denver"
+            "i_p": "Seattle"
           },
-          "width": 12.29
-        },
-        {
-          "type": "colHeader",
-          "colKey": {
-            "i_p": "Phoenix"
-          },
-          "width": 14.64
-        },
-        {
-          "type": "colHeader",
-          "colKey": {
-            "i_p": "Las Vegas"
-          },
-          "width": 15.42
+          "width": 16.27
         },
         {
           "type": "colHeader",
           "colKey": {
             "i_p": "San Francisco"
           },
-          "width": 19.81
+          "width": 22.65
         },
         {
           "type": "colHeader",
           "colKey": {
-            "i_p": "Seattle"
+            "i_p": "Las Vegas"
           },
-          "width": 13.54
+          "width": 18.68
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_p": "Denver"
+          },
+          "width": 17.33
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_p": "Phoenix"
+          },
+          "width": 20.04
         }
       ]
     },

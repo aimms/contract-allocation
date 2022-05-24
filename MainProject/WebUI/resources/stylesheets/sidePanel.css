@@ -1,0 +1,21 @@
+.sidepanel-container .sidepanel-tab.active {
+  background-color: var(--primary);
+}
+
+.sidepanel-container .sidepanel-tab.active:hover {
+  color: white;
+}
+
+.sidepanel-container .sidepanel-tab .sidepanel-icon,
+.sidepanel-container .sidepanel-tab:hover {
+  color: var(--primary);
+}
+
+.sidepanel-container .sidepanel-tabs-container:after {
+  background: var(--primary);
+}
+
+.sidepanel-container  {
+  background-color: rgba(249, 249, 249, 0.438)
+}
+

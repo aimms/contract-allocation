@@ -40,26 +40,31 @@ Model Main_CarSelection {
 				IndexDomain: (i_p);
 				Text: "Available capacity for producer p";
 				Unit: kg;
+				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
 			}
 			Parameter p_productionCost {
 				IndexDomain: (i_p,i_c);
 				Text: "Unit cost for delivery by producer p for contract c";
 				Unit: $/kg;
+				webui::AnnotationsIdentifier: sp_contractsProducersIndexedAnnotation;
 			}
 			Parameter p_minimalDelivery {
 				IndexDomain: (i_p);
 				Text: "Minimal delivery size for producer p";
 				Unit: kg;
+				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
 			}
 			Parameter p_contractSize {
 				IndexDomain: (i_c);
 				Text: "Size of contract c";
 				Unit: kg;
+				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
 			}
 			Parameter p_minimalNumberofContributors {
 				IndexDomain: (i_c);
 				Text: "Minimal number of producers that delivery to a contract";
 				Range: integer;
+				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
 			}
 		}
 		Section Math_Model {
@@ -111,17 +116,10 @@ Model Main_CarSelection {
 				Type: MIP;
 			}
 		}
-		Section Outputs;
 	}
 	Section UI_Declarations {
-		StringParameter sp_def_caseName {
-			Definition: "Scenario: " + CaseFileURL(CurrentCase);
-		}
 		StringParameter sp_logo {
 			Definition: "aimms_logo.png";
-		}
-		StringParameter sp_problemDescription {
-			Definition: FileRead("Description.txt");
 		}
 		ElementParameter ep_actualProducer {
 			Text: "Element parameter used to link Gantt chart with message";
@@ -131,7 +129,14 @@ Model Main_CarSelection {
 			Text: "Element parameter used to link Gantt chart with message";
 			Range: s_contracts;
 		}
-		ElementParameter GenerationColor {
+		StringParameter sp_messageString {
+			Text: "A message describing the production of a certain producer for a certain contract";
+			Definition: {
+				FormatString("Total delivery by producer %e for contract %e is %n",
+				ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract))
+			}
+		}
+		ElementParameter ep_generationColor {
 			IndexDomain: (i_p,i_c);
 			Text: "Display message in color, based on the amount of generation in relation to the bounds";
 			Range: AllColors;
@@ -147,39 +152,31 @@ Model Main_CarSelection {
 				endif;
 			}
 		}
-		ElementParameter SelectionColorContract {
-			IndexDomain: (i_c);
-			Text: "Color of selected contract in the interface";
-			Range: AllColors;
-			Definition: {
-				if i_c = ep_actualContract then
-					'Blue'
-				else
-					'Black'
-				endif
+		Section Annotations {
+			StringParameter sp_producersIndexedAnnotation {
+				IndexDomain: i_p;
+				Definition: {
+					if i_p = ep_actualProducer then
+						"bkg-lightblue"
+					endif
+				}
 			}
-		}
-		ElementParameter SelectionColorProducer {
-			IndexDomain: (i_p);
-			Text: "Color of selected producer in the interface";
-			Range: AllColors;
-			Definition: {
-				if i_p = ep_actualProducer then
-					'blue'
-				else
-					'Black'
-				endif
+			StringParameter sp_contractsIndexedAnnotation {
+				IndexDomain: i_c;
+				Definition: {
+					if i_c = ep_actualContract then
+						"bkg-lightblue"
+					endif
+				}
 			}
-		}
-		StringParameter MessageString {
-			Text: "A message describing the production of a certain producer for a certain contract";
-			Definition: {
-				FormatString("Total delivery by producer %e for contract %e is %n",
-				ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract) )
+			StringParameter sp_contractsProducersIndexedAnnotation {
+				IndexDomain: (i_p,i_c);
+				Definition: {
+					if i_c = ep_actualContract and i_p = ep_actualProducer then
+						"bkg-lightblue"
+					endif
+				}
 			}
-		}
-		ElementParameter ACase {
-			Range: AllCases;
 		}
 		Section Workflow {
 			StringParameter sp_myWorkflows {
@@ -204,7 +201,49 @@ Model Main_CarSelection {
 			}
 		}
 		Section SidePanel {
-			DeclarationSection DemoPage;
+			DeclarationSection DemoPage {
+				StringParameter sp_demoPageSidePanel {
+					IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
+					Definition: {
+						data 
+						{ ( 1, displayText ) : "KPIs"   ,  ( 1, pageId      ) : "informations"         ,  ( 1, tooltip     ) : "frubas"        ,
+						  ( 1, icon        ) : "aimms-question" }
+					}
+				}
+			}
+		}
+		Section Lists {
+			DeclarationSection DemoPageSidePanel {
+				StringParameter sp_myListsGroups {
+					IndexDomain: (webui::indexListGroupOrder,webui::indexListGroupSpec);
+					Definition: data { ( 1, title ) : "KPI",  ( 2, title ) : "Legend" };
+				}
+				StringParameter sp_myListGroupItems {
+					IndexDomain: (webui::indexListGroupOrder,webui::indexNoOfListItems,webui::indexListGroupItemsSpec);
+					Definition: {
+						{( '1', '1', 'icon'  ) : "aimms-circle2",  
+						( '1', '1', 'color' ) : FormatString("%e", ep_generationColor(ep_actualProducer,ep_actualContract)),  
+						( '1', '1', 'text'  ) : FormatString("Total delivery by producer %e for contract %e is %n.", ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract)),
+						( '1', '1', 'state' ) : "active"        ,
+						( '2', '1', 'icon'  ) : "aimms-circle2",
+						( '2', '1', 'color' ) : "red",
+						( '2', '1', 'text'  ) : "Red indicates that all capacity is used and the amount of delivery is minimal.",
+						( '2', '1', 'state' ) : "active",
+						( '2', '2', 'icon'  ) : "aimms-circle2",
+						( '2', '2', 'color' ) : "magenta",
+						( '2', '2', 'text'  ) : "Magenta indicates that all capacity is used. ",
+						( '2', '2', 'state' ) : "active",
+						( '2', '3', 'icon'  ) : "aimms-circle2",
+						( '2', '3', 'color' ) : "blue",
+						( '2', '3', 'text'  ) : "Blue indicates that the amount of delivery is minimal. Black in all remaining situations.",
+						(' 2', '3', 'state' ) : "active" ,
+						( '2', '4', 'icon'  ) : "aimms-circle2",
+						( '2', '4', 'color' ) : "black",
+						( '2', '4', 'text'  ) : "Otherwise.",
+						(' 2', '4', 'state' ) : "active" }
+					}
+				}
+			}
 		}
 		Section FlagsIdentifier {
 			StringParameter sp_readOnlyFlag {
@@ -250,6 +289,11 @@ Model Main_CarSelection {
 			Return 1 to allow the termination sequence to continue.
 			Return 0 if you want to cancel the termination sequence.
 			It is recommended to only use the procedure PreMainTermination to cancel the termination sequence and let this procedure always return 1."
+		}
+	}
+	Section tobedone {
+		StringParameter sp_problemDescription {
+			Definition: FileRead("Description.txt");
 		}
 	}
 }
