@@ -1,17 +1,17 @@
-    Producers := data 
+﻿    s_producers := data 
     { Seattle, 'San Francisco', 'Las Vegas', Phoenix, Denver } ;
 
-    Contracts := data 
+    s_contracts := data 
     { Washington, Oregon    , California, Idaho     , Nevada    , Montana   ,
       Wyoming   , Arizona   , Utah      , Colorado  } ;
 
 
-    AvailableCapacity(p) := data 
+    p_availableCapacity(i_p) := data 
     { Seattle         : 175,  'San Francisco' : 175,  'Las Vegas'     : 175,
       Phoenix         : 175,  Denver          : 175 } ;
 
 
-    ProductionCost(p,c) := data table 
+    p_productionCost(i_p,i_c) := data table 
                  Washington      Oregon  California       Idaho      Nevada
               !  ----------  ----------  ----------  ----------  ----------
         Seattle          10          15          10          15          20
@@ -32,18 +32,18 @@
 
 
 
-    MinimalDelivery(p) := data 
+    p_minimalDelivery(i_p) := data 
     { Seattle         : 25,  'San Francisco' : 30,  'Las Vegas'     : 25,
       Phoenix         : 35,  Denver          : 25 } ;
 
 
-    ContractSize(c) := data 
+    p_contractSize(i_c) := data 
     { Washington : 100,  Oregon     :  65,  California : 100,  Idaho      :  70,
       Nevada     : 120,  Montana    :  60,  Wyoming    :  75,  Arizona    : 100,
       Utah       :  95,  Colorado   :  85 } ;
 
 
-    MinimalNumberofContributors(c) := data 
+    p_minimalNumberofContributors(i_c) := data 
     { Washington : 3,  Oregon     : 2,  California : 3,  Idaho      : 2,
       Nevada     : 3,  Montana    : 2,  Wyoming    : 2,  Arizona    : 3,
       Utah       : 3,  Colorado   : 3 } ;
