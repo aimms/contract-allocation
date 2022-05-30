@@ -47,7 +47,7 @@
                 "children": []
               },
               {
-                "name": "Demo Page",
+                "name": "Inputs",
                 "type": "pagev2-grid",
                 "slug": "inputs",
                 "children": [
@@ -56,8 +56,20 @@
                     "type": "pagev2-grid-sidepanel",
                     "slug": "informations",
                     "children": []
+                  },
+                  {
+                    "name": "Model Information",
+                    "type": "pagev2-grid-sidepanel",
+                    "slug": "model_information",
+                    "children": []
                   }
                 ]
+              },
+              {
+                "name": "Results",
+                "type": "pagev2-grid",
+                "slug": "results",
+                "children": []
               }
             ]
           }
@@ -140,9 +152,9 @@
       "literal": {
         "componentName": "Grid",
         "props": {
-          "gridTemplateColumns": "1fr",
-          "gridTemplateRows": "1fr 0.1fr 1fr",
-          "gridTemplateAreas": "\"area-a\" \"area-b\" \"area-c\""
+          "gridTemplateColumns": "0.3fr 0.3fr 0.4fr",
+          "gridTemplateRows": "1fr",
+          "gridTemplateAreas": "\"area-a area-b area-c\""
         },
         "items": [
           {
@@ -150,7 +162,7 @@
             "props": {
               "gridArea": "area-a",
               "name": "Area A",
-              "gridAutoFlow": "column"
+              "gridAutoFlow": "row"
             }
           },
           {
@@ -158,7 +170,7 @@
             "props": {
               "gridArea": "area-b",
               "name": "Area B",
-              "gridAutoFlow": "column"
+              "gridAutoFlow": "row"
             }
           },
           {
@@ -173,7 +185,7 @@
       }
     },
     "displayName": {
-      "literal": "LayoutDemoPage"
+      "literal": "LayoutInputs"
     }
   },
   "pages/home": {
@@ -251,48 +263,67 @@
     "bindings": {
       "literal": [
         {
-          "widgetUri": "cbc_generation",
+          "widgetUri": "tbl_contractsInformation",
+          "gridArea": "area-b",
+          "dndId": "area-btbl_contractsInformation0"
+        },
+        {
+          "widgetUri": "cbc_contractsInformation",
+          "gridArea": "area-b",
+          "dndId": "Unassigned widgetscbc_contractsInformation5"
+        },
+        {
+          "widgetUri": "tbl_productionCost_1",
           "gridArea": "area-c",
-          "dndId": "area-ccbc_generation0"
+          "dndId": "area-ctbl_productionCost_11"
+        },
+        {
+          "widgetUri": "bbc_productionCost_1",
+          "gridArea": "area-c",
+          "dndId": "area-cbbc_productionCost_12"
         },
         {
           "widgetUri": "tbl_producersInformation",
           "gridArea": "area-a",
-          "dndId": "area-atbl_producersInformation1"
+          "dndId": "area-atbl_producersInformation3"
         },
         {
-          "widgetUri": "tbl_contractsInformation",
+          "widgetUri": "lnd_producersInformation_1",
           "gridArea": "area-a",
-          "dndId": "area-atbl_contractsInformation2"
-        },
-        {
-          "widgetUri": "tbl_productionCost_1",
-          "gridArea": "area-a",
-          "dndId": "Unassigned widgetstbl_productionCost_15"
-        },
-        {
-          "widgetUri": "btn_solveProblem",
-          "gridArea": "area-b",
-          "dndId": "area-bbtn_solveProblem3"
-        },
-        {
-          "widgetUri": "scl_totalCost",
-          "gridArea": "area-b",
-          "dndId": "area-bscl_totalCost4"
+          "dndId": "area-alnd_producersInformation_14"
         }
       ]
     },
     "layoutId": {
       "literal": "custom_234161e0-a7c2-477f-b278-101c9e62d5e4"
     },
-    "sidepanels": {
+    "primarypageaction": {
       "aimms": {
         "contents": [
-          "sp_demoPageSidePanel"
+          "sp_inputPrimaryActions"
         ],
         "slices": [
           {
-            "identifier": "sp_demoPageSidePanel",
+            "identifier": "sp_inputPrimaryActions",
+            "slice": [
+              {
+                "index": "webui::indexPageActionSpec",
+                "type": "free",
+                "value": "webui::indexPageActionSpec"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "secondarypageactions": {
+      "aimms": {
+        "contents": [
+          "sp_inputSecondaryActions"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_inputSecondaryActions",
             "slice": [
               {
                 "index": "webui::indexPageExtension",
@@ -300,9 +331,9 @@
                 "value": "webui::indexPageExtension"
               },
               {
-                "index": "webui::indexSidePanelSpec",
+                "index": "webui::indexPageActionSpec",
                 "type": "free",
-                "value": "webui::indexSidePanelSpec"
+                "value": "webui::indexPageActionSpec"
               }
             ]
           }
@@ -311,13 +342,6 @@
     },
     "widgets": {
       "literal": [
-        {
-          "uri": "cbc_generation",
-          "layoutInfo": {
-            "width": "2",
-            "height": "1"
-          }
-        },
         {
           "uri": "tbl_producersInformation",
           "layoutInfo": {
@@ -333,21 +357,47 @@
           }
         },
         {
-          "uri": "btn_solveProblem",
-          "layoutInfo": {
-            "width": "2",
-            "height": "1"
-          }
-        },
-        {
-          "uri": "scl_totalCost",
-          "layoutInfo": {
-            "width": "2",
-            "height": "1"
-          }
-        },
-        {
           "uri": "tbl_productionCost_1",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "lnd_producersInformation_1",
+          "layoutInfo": {}
+        },
+        {
+          "uri": "bbc_productionCost_1",
+          "layoutInfo": {}
+        },
+        {
+          "uri": "cbc_contractsInformation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    }
+  },
+  "pages/model_information": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid-sidepanel"
+    },
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "scl_modelInformation",
+          "gridArea": "area-a",
+          "dndId": "Unassigned widgetsscl_modelInformation0"
+        }
+      ]
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "scl_modelInformation",
           "layoutInfo": {
             "width": "2",
             "height": "1"
@@ -384,24 +434,245 @@
       ]
     }
   },
-  "widgets/btn_solveProblem": {
-    "action": {
-      "literal": {
-        "type": "procedure",
-        "value": "MainExecution"
+  "pages/results": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid"
+    },
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "cbc_costPerProducer",
+          "gridArea": "area-a",
+          "dndId": "Unassigned widgetscbc_costPerProducer2"
+        },
+        {
+          "widgetUri": "cbc_generation",
+          "gridArea": "area-b",
+          "dndId": "area-bcbc_generation1"
+        }
+      ]
+    },
+    "sidepanels": {
+      "aimms": {
+        "contents": [
+          "sp_resultsSidePanel"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_resultsSidePanel",
+            "slice": [
+              {
+                "index": "webui::indexPageExtension",
+                "type": "free",
+                "value": "webui::indexPageExtension"
+              },
+              {
+                "index": "webui::indexSidePanelSpec",
+                "type": "free",
+                "value": "webui::indexSidePanelSpec"
+              }
+            ]
+          }
+        ]
       }
     },
-    "aimms.widget.type": {
-      "literal": "button"
-    },
-    "name": {
-      "literal": "btn_solveProblem"
-    },
-    "title": {
-      "literal": "Solve Problem"
+    "widgets": {
+      "literal": [
+        {
+          "uri": "cbc_generation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "cbc_costPerProducer",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
     }
   },
-  "widgets/cbc_generation": {
+  "widgets/bbc_productionCost_1": {
+    "aimms.widget.type": {
+      "literal": "combinationchart"
+    },
+    "color.index": {
+      "literal": "i_contract"
+    },
+    "contents.__display_order__": {
+      "literal": [
+        "contents.0"
+      ]
+    },
+    "contents.0.chart.type": {
+      "literal": "scatter"
+    },
+    "contents.0.displaydomain": {
+      "literal": "1"
+    },
+    "contents.0.identifier": {
+      "literal": {
+        "identifier": "p_productionCost",
+        "slice": [
+          {
+            "index": "i_producer",
+            "type": "free",
+            "value": "i_producer"
+          },
+          {
+            "index": "i_contract",
+            "type": "free",
+            "value": "i_contract"
+          }
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "contents.partition": {
+      "literal": {
+        "header": [
+          "i_producer"
+        ],
+        "grouped": [
+          "i_contract"
+        ],
+        "stacked": [],
+        "aggregated": [
+          "<IDENTIFIER-SET>"
+        ]
+      }
+    },
+    "contents.show.units": {
+      "literal": true
+    },
+    "data.labels.show": {
+      "literal": true
+    },
+    "indices.__display_order__": {
+      "literal": [
+        "indices.0",
+        "indices.1"
+      ]
+    },
+    "indices.0.index": {
+      "literal": "i_producer"
+    },
+    "indices.0.storefocus": {
+      "literal": {
+        "identifier": "ep_actualProducer"
+      }
+    },
+    "indices.1.index": {
+      "literal": "i_contract"
+    },
+    "indices.1.storefocus": {
+      "literal": {
+        "identifier": "ep_actualContract"
+      }
+    },
+    "legend.show": {
+      "literal": true
+    },
+    "name": {
+      "literal": "cbc_productionCost"
+    }
+  },
+  "widgets/cbc_contractsInformation": {
+    "aimms.widget.type": {
+      "literal": "combinationchart"
+    },
+    "color.index": {
+      "literal": "i_contract"
+    },
+    "contents.__display_order__": {
+      "literal": [
+        "contents.0",
+        "contents.1"
+      ]
+    },
+    "contents.0.chart.type": {
+      "literal": "area"
+    },
+    "contents.0.identifier": {
+      "literal": {
+        "identifier": "p_contractSize",
+        "slice": [
+          {
+            "index": "i_contract",
+            "type": "free",
+            "value": "i_contract"
+          }
+        ]
+      }
+    },
+    "contents.0.show.units": {
+      "literal": false
+    },
+    "contents.1.chart.axis.y.select": {
+      "literal": "secondary_axis"
+    },
+    "contents.1.chart.type": {
+      "literal": "column"
+    },
+    "contents.1.identifier": {
+      "literal": {
+        "identifier": "p_minimalNumberofContributors",
+        "slice": [
+          {
+            "index": "i_contract",
+            "type": "free",
+            "value": "i_contract"
+          }
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "contents.partition": {
+      "literal": {
+        "header": [
+          "i_contract"
+        ],
+        "grouped": [],
+        "stacked": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "contents.show.units": {
+      "literal": true
+    },
+    "data.labels.show": {
+      "literal": false
+    },
+    "indices.__display_order__": {
+      "literal": [
+        "indices.0"
+      ]
+    },
+    "indices.0.index": {
+      "literal": "i_contract"
+    },
+    "indices.0.storefocus": {
+      "literal": {
+        "identifier": "ep_actualContract"
+      }
+    },
+    "legend.show": {
+      "literal": true
+    },
+    "name": {
+      "literal": "cbc_contractsInformation"
+    }
+  },
+  "widgets/cbc_costPerProducer": {
     "aimms.widget.type": {
       "literal": "combinationchart"
     },
@@ -410,19 +681,22 @@
         "contents.0"
       ]
     },
+    "contents.0.chart.type": {
+      "literal": "column"
+    },
     "contents.0.identifier": {
       "literal": {
-        "identifier": "v_generation",
+        "identifier": "p_disaggregatedCost",
         "slice": [
           {
-            "index": "i_p",
+            "index": "i_producer",
             "type": "free",
-            "value": "i_p"
+            "value": "i_producer"
           },
           {
-            "index": "i_c",
+            "index": "i_contract",
             "type": "free",
-            "value": "i_c"
+            "value": "i_contract"
           }
         ]
       }
@@ -430,18 +704,97 @@
     "contents.0.numdecimals": {
       "literal": 0
     },
+    "contents.0.show.units": {
+      "literal": true
+    },
     "contents.partition": {
       "literal": {
         "header": [
-          "i_c"
+          "i_contract"
         ],
         "grouped": [],
         "stacked": [
-          "i_p"
+          "i_producer"
         ],
         "aggregated": [
           "<IDENTIFIER-SET>"
         ]
+      }
+    },
+    "data.labels.show": {
+      "literal": true
+    },
+    "indices.__display_order__": {
+      "literal": [
+        "indices.0"
+      ]
+    },
+    "legend.show": {
+      "literal": true
+    },
+    "name": {
+      "literal": "cbc_allocatedCosts"
+    },
+    "title": {
+      "literal": "Allocated Costs"
+    }
+  },
+  "widgets/cbc_generation": {
+    "aimms.widget.type": {
+      "literal": "combinationchart"
+    },
+    "contents.__display_order__": {
+      "literal": [
+        "contents.0",
+        "contents.1"
+      ]
+    },
+    "contents.0.identifier": {
+      "literal": {
+        "identifier": "v_generation",
+        "slice": [
+          {
+            "index": "i_producer",
+            "type": "free",
+            "value": "i_producer"
+          },
+          {
+            "index": "i_contract",
+            "type": "free",
+            "value": "i_contract"
+          }
+        ]
+      }
+    },
+    "contents.0.numdecimals": {
+      "literal": 0
+    },
+    "contents.1.identifier": {
+      "literal": {
+        "identifier": "p_slackAllocation",
+        "slice": [
+          {
+            "index": "i_contract",
+            "type": "free",
+            "value": "i_contract"
+          }
+        ]
+      }
+    },
+    "contents.1.numdecimals": {
+      "literal": 0
+    },
+    "contents.partition": {
+      "literal": {
+        "header": [
+          "i_contract"
+        ],
+        "grouped": [],
+        "stacked": [
+          "<IDENTIFIER-SET>",
+          "i_producer"
+        ],
+        "aggregated": []
       }
     },
     "contents.show.units": {
@@ -460,7 +813,7 @@
       ]
     },
     "indices.0.index": {
-      "literal": "i_p"
+      "literal": "i_producer"
     },
     "indices.0.storefocus": {
       "literal": {
@@ -468,7 +821,7 @@
       }
     },
     "indices.1.index": {
-      "literal": "i_c"
+      "literal": "i_contract"
     },
     "indices.1.storefocus": {
       "literal": {
@@ -498,6 +851,99 @@
     },
     "name": {
       "literal": "img_homeLogo"
+    }
+  },
+  "widgets/lnd_producersInformation_1": {
+    "aimms.widget.type": {
+      "literal": "combinationchart"
+    },
+    "axis.y.0.min": {
+      "literal": 0
+    },
+    "color.index": {
+      "literal": "<IDENTIFIER-SET>"
+    },
+    "contents.__display_order__": {
+      "literal": [
+        "contents.0",
+        "contents.1"
+      ]
+    },
+    "contents.0.chart.type": {
+      "literal": "area"
+    },
+    "contents.0.identifier": {
+      "literal": {
+        "identifier": "p_availableCapacity",
+        "slice": [
+          {
+            "index": "i_producer",
+            "type": "free",
+            "value": "i_producer"
+          }
+        ]
+      }
+    },
+    "contents.1.chart.type": {
+      "literal": "area"
+    },
+    "contents.1.identifier": {
+      "literal": {
+        "identifier": "p_minimalDelivery",
+        "slice": [
+          {
+            "index": "i_producer",
+            "type": "free",
+            "value": "i_producer"
+          }
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "contents.partition": {
+      "literal": {
+        "header": [
+          "i_producer"
+        ],
+        "stacked": [],
+        "grouped": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "contents.show.units": {
+      "literal": true
+    },
+    "data.interpolate": {
+      "literal": false
+    },
+    "data.labels.show": {
+      "literal": false
+    },
+    "indices.__display_order__": {
+      "literal": [
+        "indices.0"
+      ]
+    },
+    "indices.0.index": {
+      "literal": "i_producer"
+    },
+    "indices.0.storefocus": {
+      "literal": {
+        "identifier": "ep_actualProducer"
+      }
+    },
+    "legend.show": {
+      "literal": true
+    },
+    "name": {
+      "literal": "cbc_producersInformation"
+    },
+    "yaxis.min": {
+      "literal": 0
     }
   },
   "widgets/lst_information": {
@@ -561,22 +1007,24 @@
       "literal": "lst_information"
     }
   },
-  "widgets/scl_totalCost": {
+  "widgets/scl_modelInformation": {
     "aimms.widget.type": {
       "literal": "scalar"
-    },
-    "compact": {
-      "literal": 1
     },
     "contents": {
       "aimms": {
         "contents": [
+          "ep_programStatus",
+          "p_gap",
+          "p_numberOfConstraints",
+          "p_numberOfVariables",
+          "p_solutionTime",
           "v_totalCost"
         ]
       }
     },
     "name": {
-      "literal": "scl_totalCost"
+      "literal": "scl_modelInformation"
     }
   },
   "widgets/tbl_contractsInformation": {
@@ -594,13 +1042,25 @@
     "contents.partition": {
       "literal": {
         "rowHeader": [
-          "i_c"
+          "i_contract"
         ],
         "colHeader": [
           "<IDENTIFIER-SET>"
         ],
         "aggregated": []
       }
+    },
+    "contents.sorting": {
+      "literal": [
+        {
+          "partIndex": 1,
+          "partOffsets": [
+            3,
+            -1
+          ],
+          "mode": "setorder"
+        }
+      ]
     },
     "custom.column.widths": {
       "literal": [
@@ -645,7 +1105,7 @@
     "contents.partition": {
       "literal": {
         "rowHeader": [
-          "i_p"
+          "i_producer"
         ],
         "colHeader": [
           "<IDENTIFIER-SET>"
@@ -695,10 +1155,10 @@
     "contents.partition": {
       "literal": {
         "rowHeader": [
-          "i_c"
+          "i_contract"
         ],
         "colHeader": [
-          "i_p"
+          "i_producer"
         ],
         "aggregated": [
           "<IDENTIFIER-SET>"
@@ -750,11 +1210,46 @@
             "i_p": "Phoenix"
           },
           "width": 20.04
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_producer": "Seattle"
+          },
+          "width": 18.57
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_producer": "San Francisco"
+          },
+          "width": 15.83
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_producer": "Las Vegas"
+          },
+          "width": 15.62
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_producer": "Phoenix"
+          },
+          "width": 17.5
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_producer": "Denver"
+          },
+          "width": 15.41
         }
       ]
     },
     "name": {
-      "literal": "tbl_productionCost (1)"
+      "literal": "tbl_productionCost"
     },
     "show.units": {
       "literal": 1
@@ -779,7 +1274,7 @@
       "literal": "text"
     },
     "contents": {
-      "literal": "<div style=\"text-align: center;\">&nbsp;</div><div><b style=\"font-size: 32px;\">Welcome!</b></div><div><br></div><div><span style=\"font-size: 18px;\">You are in a AIMMS Example. Feel free to play around and create something more from this app. </span></div><div><span style=\"font-size: 18px;\">And, if you do, please, fork this repository and commit your changes.&nbsp;</span><b style=\"font-size: 18px;\">Making our github always up to date to the entire community!</b></div><div><br></div><div><span style=\"font-size: 18px;\">And, do not forget to sign up to our&nbsp;</span><a href=\"https://community.aimms.com/\" target=\"_blank\"><b style=\"background-color: inherit; font-size: 18px;\">Communit</b><b style=\"font-size: 18px;\">y</b></a><b style=\"font-size: 18px;\">&nbsp;</b><span style=\"font-size: 18px;\">and </span><b style=\"background-color: inherit; font-size: 18px;\"><a href=\"https://academy.aimms.com/\" target=\"_blank\">Academy</a></b><span style=\"font-size: 18px;\">.</span></div><div><br></div><div><span style=\"font-size: 18px;\">In the </span><span style=\"background-color: rgb(255, 255, 204); font-size: 18px;\">community</span><span style=\"font-size: 18px;\">, you will be able to talk to other developers and AIMMSians, all of us ready to help.</span></div><div><br></div><div><span style=\"font-size: 18px;\">At the </span><span style=\"background-color: rgb(255, 255, 204); font-size: 18px;\">academy</span><span style=\"font-size: 18px;\">, you will be able to practice and try some new challenges. We are always creating new courses, so keep an eye out for upcoming courses.</span></div><div><br></div><div><span style=\"font-size: 18px;\">However, if you have any question or curiosity that cannot be posted on the community, please contact us at </span><i style=\"background-color: rgb(255, 255, 204); font-size: 18px;\">support@aimms.com</i><i style=\"font-size: 18px;\">.</i></div>"
+      "literal": "<div style=\"text-align: center;\">&nbsp;</div><div><b style=\"font-size: 32px;\">Welcome!</b></div><div><br></div><div><span style=\"font-size: 18px;\">You are in a AIMMS Example. Feel free to play around and create something more from this app. </span></div><div><span style=\"font-size: 18px;\">And, if you do, please, fork this repository and commit your changes.&nbsp;</span><b style=\"font-size: 18px;\">Making our github always up to date to the entire community!</b></div><div><br></div><div><span style=\"font-size: 18px;\">And, do not forget to sign up to our&nbsp;</span><a href=\"https://community.aimms.com/\" target=\"_blank\"><b style=\"background-color: inherit; font-size: 18px;\">Communit</b><b style=\"font-size: 18px;\">y</b></a><b style=\"font-size: 18px;\">&nbsp;</b><span style=\"font-size: 18px;\">and </span><b style=\"background-color: inherit; font-size: 18px;\"><a href=\"https://academy.aimms.com/\" target=\"_blank\">Academy</a></b><span style=\"font-size: 18px;\">.</span></div><div><br></div><div><span style=\"font-size: 18px;\">In the </span><span style=\"background-color: rgb(255, 255, 204); font-size: 18px;\">community</span><span style=\"font-size: 18px;\">, you will be able to talk to other developers and AIMMSians, all of us ready to help.</span></div><div><br></div><div><span style=\"font-size: 18px;\">At the </span><span style=\"background-color: rgb(255, 255, 204); font-size: 18px;\">academy</span><span style=\"font-size: 18px;\">, you will be able to practice and try some new challenges. We are always creating new courses, so keep an eye out for upcoming courses.</span></div><div><br></div><div><span style=\"font-size: 18px;\">However, if you have any question or curiosity that cannot be posted on the community, please contact us at </span><i style=\"background-color: rgb(255, 255, 204); font-size: 18px;\">support@aimms.com</i><i style=\"font-size: 18px;\">.</i></div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div>"
     },
     "name": {
       "literal": "txt_welcome"

@@ -1,6 +1,6 @@
 ## ams_version=1.0
 
-Model Main_CarSelection {
+Model Main_ContractAllocation {
 	Section Data_Model {
 		Section Quantities_and_Units {
 			Comment: {
@@ -27,41 +27,58 @@ Model Main_CarSelection {
 			}
 		}
 		Section Inputs {
+			Procedure pr_importExcelData {
+				Body: {
+					dex::AddMapping(
+						mappingName :  "inputs", 
+						mappingFile :  "Mappings/inputs.xml");
+					
+					dex::ReadFromFile(
+						dataFile         :  "NothWesternStates.xlsx", 
+						mappingName      :  "inputs", 
+						emptyIdentifiers :  1, 
+						emptySets        :  1, 
+						resetCounters    :  1);
+					
+					ep_actualContract := first(i_contract);
+					ep_actualProducer := first(i_producer);
+				}
+			}
 			Set s_producers {
 				Text: "The set of all producers";
-				Index: i_p, i_p1;
+				Index: i_producer;
 			}
 			Set s_contracts {
 				Text: "The set of all contracts";
-				Index: i_c, i_c1;
+				Index: i_contract, i_contract1;
 				Parameter: ep_contract;
 			}
 			Parameter p_availableCapacity {
-				IndexDomain: (i_p);
+				IndexDomain: (i_producer);
 				Text: "Available capacity for producer p";
 				Unit: kg;
 				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
 			}
 			Parameter p_productionCost {
-				IndexDomain: (i_p,i_c);
+				IndexDomain: (i_producer,i_contract);
 				Text: "Unit cost for delivery by producer p for contract c";
 				Unit: $/kg;
 				webui::AnnotationsIdentifier: sp_contractsProducersIndexedAnnotation;
 			}
 			Parameter p_minimalDelivery {
-				IndexDomain: (i_p);
+				IndexDomain: (i_producer);
 				Text: "Minimal delivery size for producer p";
 				Unit: kg;
 				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
 			}
 			Parameter p_contractSize {
-				IndexDomain: (i_c);
+				IndexDomain: (i_contract);
 				Text: "Size of contract c";
 				Unit: kg;
 				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
 			}
 			Parameter p_minimalNumberofContributors {
-				IndexDomain: (i_c);
+				IndexDomain: (i_contract);
 				Text: "Minimal number of producers that delivery to a contract";
 				Range: integer;
 				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
@@ -71,42 +88,42 @@ Model Main_CarSelection {
 			Variable v_totalCost {
 				Text: "Total cost of all deliveries";
 				Unit: $;
-				Definition: sum((i_p,i_c), p_productionCost(i_p,i_c) * v_generation(i_p,i_c));
+				Definition: sum((i_producer,i_contract), p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract));
 			}
 			Variable v_generation {
-				IndexDomain: (i_p,i_c);
+				IndexDomain: (i_producer,i_contract);
 				Text: "Amount of commodity delivered by producers p for contract c";
-				Range: [p_minimalDelivery(i_p), 10000);
+				Range: [p_minimalDelivery(i_producer), 10000);
 				Unit: kg;
 				Property: SemiContinuous;
 			}
 			Variable v_generationIncidence {
-				IndexDomain: (i_p,i_c);
+				IndexDomain: (i_producer,i_contract);
 				Text: "Producers p produce for contract c";
 				Range: binary;
 			}
 			Constraint c_capacity {
-				IndexDomain: (i_p);
+				IndexDomain: (i_producer);
 				Text: "Production capacity for producer p";
 				Unit: kg;
-				Definition: sum(i_c, v_generation(i_p,i_c)) <= p_availableCapacity(i_p);
+				Definition: sum(i_contract, v_generation(i_producer,i_contract)) <= p_availableCapacity(i_producer);
 			}
 			Constraint c_contractFullfillment {
-				IndexDomain: (i_c);
+				IndexDomain: (i_contract);
 				Text: "The demand for contract c is met";
 				Unit: kg;
-				Definition: sum(i_p, v_generation(i_p,i_c)) >= p_contractSize(i_c);
+				Definition: sum(i_producer, v_generation(i_producer,i_contract)) >= p_contractSize(i_contract);
 			}
 			Constraint c_contractContribution {
-				IndexDomain: (i_c);
+				IndexDomain: (i_contract);
 				Text: "Mimimal number of contributors to contract c";
-				Definition: sum(i_p, v_generationIncidence(i_p,i_c)) >= p_minimalNumberofContributors(i_c);
+				Definition: sum(i_producer, v_generationIncidence(i_producer,i_contract)) >= p_minimalNumberofContributors(i_contract);
 			}
 			Constraint c_generationIncidenceDetermination {
-				IndexDomain: (i_p,i_c);
+				IndexDomain: (i_producer,i_contract);
 				Text: "Determine if producer p delivers to contract c";
 				Unit: kg;
-				Definition: v_generation(i_p,i_c) >= p_minimalDelivery(i_p) * v_generationIncidence(i_p,i_c);
+				Definition: v_generation(i_producer,i_contract) >= p_minimalDelivery(i_producer) * v_generationIncidence(i_producer,i_contract);
 			}
 			MathematicalProgram mp_contractAllocation {
 				Objective: v_totalCost;
@@ -115,9 +132,60 @@ Model Main_CarSelection {
 				Variables: AllVariables;
 				Type: MIP;
 			}
+			DeclarationSection Model_Information {
+				ElementParameter ep_programStatus {
+					Range: AllSolutionStates;
+					webui::FlagsIdentifier: sp_readOnlyFlag;
+				}
+				Parameter p_gap {
+					webui::FlagsIdentifier: sp_readOnlyFlag;
+				}
+				Parameter p_numberOfConstraints {
+					webui::FlagsIdentifier: sp_readOnlyFlag;
+				}
+				Parameter p_numberOfVariables {
+					webui::FlagsIdentifier: sp_readOnlyFlag;
+				}
+				Parameter p_solutionTime {
+					Unit: s;
+					webui::FlagsIdentifier: sp_readOnlyFlag;
+				}
+			}
+			Procedure pr_modelInformation {
+				Body: {
+					empty Model_Information;
+					
+					ep_programStatus := mp_contractAllocation.ProgramStatus;
+					p_gap := abs(1 - (mp_contractAllocation.Objective /$ mp_contractAllocation.BestBound));
+					p_solutionTime := mp_contractAllocation.SolutionTime;
+					p_numberOfConstraints := mp_contractAllocation.NumberOfConstraints;
+					p_numberOfVariables := mp_contractAllocation.NumberOfVariables;
+				}
+			}
+		}
+		Section Outputs {
+			Parameter p_slackAllocation {
+				IndexDomain: i_contract;
+				Unit: kg;
+				Definition: {
+					p_contractSize(i_contract) 
+					- sum(i_producer, v_generation(i_producer, i_contract))
+				}
+				webui::AnnotationsIdentifier: sp_slackAllocationAnnotation(i_contract);
+			}
+			StringParameter sp_slackAllocationAnnotation {
+				IndexDomain: i_contract | p_slackAllocation(i_contract);
+				Definition: "hassomeslack";
+			}
+			Parameter p_disaggregatedCost {
+				IndexDomain: (i_producer,i_contract);
+				Unit: $;
+				Definition: p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract);
+			}
 		}
 	}
 	Section UI_Declarations {
+		Procedure pr_empty;
 		StringParameter sp_logo {
 			Definition: "aimms_logo.png";
 		}
@@ -129,55 +197,6 @@ Model Main_CarSelection {
 			Text: "Element parameter used to link Gantt chart with message";
 			Range: s_contracts;
 		}
-		StringParameter sp_messageString {
-			Text: "A message describing the production of a certain producer for a certain contract";
-			Definition: {
-				FormatString("Total delivery by producer %e for contract %e is %n",
-				ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract))
-			}
-		}
-		ElementParameter ep_generationColor {
-			IndexDomain: (i_p,i_c);
-			Text: "Display message in color, based on the amount of generation in relation to the bounds";
-			Range: AllColors;
-			Definition: {
-				if sum(i_c1, v_generation(i_p,i_c1)) = p_availableCapacity(i_p) and v_generation(i_p,i_c) = p_minimalDelivery(i_p) then
-					    'red'
-				elseif  sum(i_c1, v_generation(i_p,i_c1)) = p_availableCapacity(i_p) then
-					    'magenta'
-				elseif  v_generation(i_p,i_c) = p_minimalDelivery(i_p) then
-					    'blue'
-				else
-					    'Black'
-				endif;
-			}
-		}
-		Section Annotations {
-			StringParameter sp_producersIndexedAnnotation {
-				IndexDomain: i_p;
-				Definition: {
-					if i_p = ep_actualProducer then
-						"bkg-lightblue"
-					endif
-				}
-			}
-			StringParameter sp_contractsIndexedAnnotation {
-				IndexDomain: i_c;
-				Definition: {
-					if i_c = ep_actualContract then
-						"bkg-lightblue"
-					endif
-				}
-			}
-			StringParameter sp_contractsProducersIndexedAnnotation {
-				IndexDomain: (i_p,i_c);
-				Definition: {
-					if i_c = ep_actualContract and i_p = ep_actualProducer then
-						"bkg-lightblue"
-					endif
-				}
-			}
-		}
 		Section Workflow {
 			StringParameter sp_myWorkflows {
 				IndexDomain: (webui::indexWorkflowOrder,webui::indexWorkflowSpec);
@@ -187,60 +206,136 @@ Model Main_CarSelection {
 				Definition: {
 					data 
 					{ ( 1, 1, displayText       ) : "Welcome"            ,  ( 1, 1, icon              ) : "aimms-happy"        ,
-					  ( 1, 1, pageId            ) : "home"               ,  ( 1, 1, tooltip           ) : "Problem Description",
+					  ( 1, 1, pageId            ) : "home"               ,  ( 1, 1, tooltip           ) : "welcome"            ,
 					  ( 1, 1, workflowPageState ) : "Active"             ,  ( 1, 1, pageDataState     ) : "Incomplete"         ,
 					  ( 1, 1, redirectPageId    ) : "home"               ,  ( 1, 2, displayText       ) : "Problem Description",
 					  ( 1, 2, icon              ) : "aimms-lamp5"        ,  ( 1, 2, pageId            ) : "problem_description",
-					  ( 1, 2, tooltip           ) : "Problem Description",  ( 1, 2, workflowPageState ) : "Active"             ,
+					  ( 1, 2, tooltip           ) : "Problem description",  ( 1, 2, workflowPageState ) : "Active"             ,
 					  ( 1, 2, pageDataState     ) : "Incomplete"         ,  ( 1, 2, redirectPageId    ) : "home"               ,
-					  ( 1, 3, displayText       ) : "Demo Page"          ,  ( 1, 3, icon              ) : "aimms-equalizer2"   ,
-					  ( 1, 3, pageId            ) : "inputs"             ,  ( 1, 3, tooltip           ) : "Demo Page"          ,
+					  ( 1, 3, displayText       ) : "Inputs"             ,  ( 1, 3, icon              ) : "aimms-equalizer2"   ,
+					  ( 1, 3, pageId            ) : "inputs"             ,  ( 1, 3, tooltip           ) : "Input data"         ,
 					  ( 1, 3, workflowPageState ) : "Active"             ,  ( 1, 3, pageDataState     ) : "Incomplete"         ,
-					  ( 1, 3, redirectPageId    ) : "home"                }
+					  ( 1, 3, redirectPageId    ) : "home"               ,  ( 1, 4, displayText       ) : "Results"            ,
+					  ( 1, 4, icon              ) : "aimms-make-group"   ,  ( 1, 4, pageId            ) : "results"            ,
+					  ( 1, 4, tooltip           ) : "Model outputs"      ,  ( 1, 4, workflowPageState ) : "Active"             ,
+					  ( 1, 4, pageDataState     ) : "Incomplete"         ,  ( 1, 4, redirectPageId    ) : "home"                }
 				}
 			}
 		}
-		Section SidePanel {
-			DeclarationSection DemoPage {
-				StringParameter sp_demoPageSidePanel {
-					IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
-					Definition: {
-						data 
-						{ ( 1, displayText ) : "KPIs"   ,  ( 1, pageId      ) : "informations"         ,  ( 1, tooltip     ) : "frubas"        ,
-						  ( 1, icon        ) : "aimms-question" }
+		Section Pages {
+			Section Input_Page {
+				DeclarationSection Input_Annotations {
+					StringParameter sp_producersIndexedAnnotation {
+						IndexDomain: i_producer;
+						Definition: {
+							if i_producer = ep_actualProducer then
+								"bkg-lightblue"
+							endif
+						}
+					}
+					StringParameter sp_contractsIndexedAnnotation {
+						IndexDomain: i_contract;
+						Definition: {
+							if i_contract = ep_actualContract then
+								"bkg-lightblue"
+							endif
+						}
+					}
+					StringParameter sp_contractsProducersIndexedAnnotation {
+						IndexDomain: (i_producer,i_contract);
+						Definition: {
+							if i_contract = ep_actualContract and i_producer = ep_actualProducer then
+								"bkg-lightblue"
+							endif
+						}
+					}
+				}
+				DeclarationSection Input_PageAction {
+					StringParameter sp_inputPrimaryActions {
+						IndexDomain: (webui::indexPageActionSpec);
+						Definition: data { displaytext : "Menu",  icon : "aimms-make-group",  procedure : "pr_empty",  state : "active" };
+					}
+					StringParameter sp_inputSecondaryActions {
+						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
+						Definition: {
+							data 
+							{ ( 1, displaytext ) : "Import"            ,  ( 1, icon        ) : "aimms-file-excel"  ,
+							  ( 1, procedure   ) : "pr_importExcelData",  ( 1, state       ) : "active"            ,
+							  ( 2, displaytext ) : "Solve"             ,  ( 2, icon        ) : "aimms-cog"         ,
+							  ( 2, procedure   ) : "mainexecution"     ,  ( 2, state       ) : "active"             }
+						}
 					}
 				}
 			}
-		}
-		Section Lists {
-			DeclarationSection DemoPageSidePanel {
-				StringParameter sp_myListsGroups {
-					IndexDomain: (webui::indexListGroupOrder,webui::indexListGroupSpec);
-					Definition: data { ( 1, title ) : "KPI",  ( 2, title ) : "Legend" };
-				}
-				StringParameter sp_myListGroupItems {
-					IndexDomain: (webui::indexListGroupOrder,webui::indexNoOfListItems,webui::indexListGroupItemsSpec);
+			Section Results_Page {
+				StringParameter sp_messageString {
+					Text: "A message describing the production of a certain producer for a certain contract";
 					Definition: {
-						{( '1', '1', 'icon'  ) : "aimms-circle2",  
-						( '1', '1', 'color' ) : FormatString("%e", ep_generationColor(ep_actualProducer,ep_actualContract)),  
-						( '1', '1', 'text'  ) : FormatString("Total delivery by producer %e for contract %e is %n.", ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract)),
-						( '1', '1', 'state' ) : "active"        ,
-						( '2', '1', 'icon'  ) : "aimms-circle2",
-						( '2', '1', 'color' ) : "red",
-						( '2', '1', 'text'  ) : "Red indicates that all capacity is used and the amount of delivery is minimal.",
-						( '2', '1', 'state' ) : "active",
-						( '2', '2', 'icon'  ) : "aimms-circle2",
-						( '2', '2', 'color' ) : "magenta",
-						( '2', '2', 'text'  ) : "Magenta indicates that all capacity is used. ",
-						( '2', '2', 'state' ) : "active",
-						( '2', '3', 'icon'  ) : "aimms-circle2",
-						( '2', '3', 'color' ) : "blue",
-						( '2', '3', 'text'  ) : "Blue indicates that the amount of delivery is minimal. Black in all remaining situations.",
-						(' 2', '3', 'state' ) : "active" ,
-						( '2', '4', 'icon'  ) : "aimms-circle2",
-						( '2', '4', 'color' ) : "black",
-						( '2', '4', 'text'  ) : "Otherwise.",
-						(' 2', '4', 'state' ) : "active" }
+						FormatString("Total delivery by producer %e for contract %e is %n",
+						ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract))
+					}
+				}
+				ElementParameter ep_generationColor {
+					IndexDomain: (i_producer,i_contract);
+					Text: "Display message in color, based on the amount of generation in relation to the bounds";
+					Range: AllColors;
+					Definition: {
+						if sum(i_contract1, v_generation(i_producer,i_contract1)) = p_availableCapacity(i_producer) 
+						    and v_generation(i_producer,i_contract) = p_minimalDelivery(i_producer) then
+							'red'
+						
+						elseif  sum(i_contract1, v_generation(i_producer,i_contract1)) = p_availableCapacity(i_producer) then
+							'magenta'
+						
+						elseif  v_generation(i_producer,i_contract) = p_minimalDelivery(i_producer) then
+							'blue'
+						
+						else
+							'black'
+						endif;
+					}
+				}
+				DeclarationSection Result_Side_Panel {
+					StringParameter sp_resultsSidePanel {
+						IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
+						Definition: {
+							data 
+							{ ( 1, displayText ) : "KPIs"             ,  ( 1, pageId      ) : "informations"     ,
+							  ( 1, icon        ) : "aimms-question"   ,  ( 1, state       ) : "active"           ,
+							  ( 2, displayText ) : "Model Information",  ( 2, pageId      ) : "model_information",
+							  ( 2, icon        ) : "aimms-info"       ,  ( 2, state       ) : "active"            }
+						}
+					}
+				}
+				DeclarationSection Result_Lists {
+					StringParameter sp_myListsGroups {
+						IndexDomain: (webui::indexListGroupOrder,webui::indexListGroupSpec);
+						Definition: data { ( 1, title ) : "KPI",  ( 2, title ) : "Legend" };
+					}
+					StringParameter sp_myListGroupItems {
+						IndexDomain: (webui::indexListGroupOrder,webui::indexNoOfListItems,webui::indexListGroupItemsSpec);
+						Definition: {
+							{( '1', '1', 'icon'  ) : "aimms-circle2",  
+							( '1', '1', 'color' ) : FormatString("%e", ep_generationColor(ep_actualProducer,ep_actualContract)),  
+							( '1', '1', 'text'  ) : FormatString("Total delivery by producer %e for contract %e is %n.", ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract)),
+							( '1', '1', 'state' ) : "active"        ,
+							( '2', '1', 'icon'  ) : "aimms-circle2",
+							( '2', '1', 'color' ) : "red",
+							( '2', '1', 'text'  ) : "Red indicates that all capacity is used and the amount of delivery is minimal.",
+							( '2', '1', 'state' ) : "active",
+							( '2', '2', 'icon'  ) : "aimms-circle2",
+							( '2', '2', 'color' ) : "magenta",
+							( '2', '2', 'text'  ) : "Magenta indicates that all capacity is used. ",
+							( '2', '2', 'state' ) : "active",
+							( '2', '3', 'icon'  ) : "aimms-circle2",
+							( '2', '3', 'color' ) : "blue",
+							( '2', '3', 'text'  ) : "Blue indicates that the amount of delivery is minimal. Black in all remaining situations.",
+							(' 2', '3', 'state' ) : "active" ,
+							( '2', '4', 'icon'  ) : "aimms-circle2",
+							( '2', '4', 'color' ) : "black",
+							( '2', '4', 'text'  ) : "Otherwise.",
+							(' 2', '4', 'state' ) : "active" }
+						}
 					}
 				}
 			}
@@ -251,14 +346,7 @@ Model Main_CarSelection {
 			}
 		}
 	}
-	Procedure MainInitialization {
-		Body: {
-			read from file "<prj>:NothWesternStates.txt";
-			ep_actualContract := first(i_c);
-			ep_actualProducer := first(i_p);
-		}
-		Comment: "Add initialization statements here that do NOT require any library being initialized already.";
-	}
+	Procedure MainInitialization;
 	Procedure PostMainInitialization {
 		Comment: {
 			"Add initialization statements here that require that the libraries are already initialized properly,
@@ -268,6 +356,8 @@ Model Main_CarSelection {
 	Procedure MainExecution {
 		Body: {
 			solve mp_contractAllocation;
+			
+			pr_modelInformation;
 		}
 	}
 	Procedure PreMainTermination {
@@ -289,11 +379,6 @@ Model Main_CarSelection {
 			Return 1 to allow the termination sequence to continue.
 			Return 0 if you want to cancel the termination sequence.
 			It is recommended to only use the procedure PreMainTermination to cancel the termination sequence and let this procedure always return 1."
-		}
-	}
-	Section tobedone {
-		StringParameter sp_problemDescription {
-			Definition: FileRead("Description.txt");
 		}
 	}
 }

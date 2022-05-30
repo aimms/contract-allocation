@@ -1,3 +1,9 @@
 .annotation-bkg-lightblue {
   background: var(--primary90Transparent);
 }
+
+.annotation-hassomeslack {
+	fill:white; 
+	stroke: var(--primaryDark) !Important; 
+	stroke-width:2px; 
+}
