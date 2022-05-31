@@ -41,7 +41,7 @@
                 "children": []
               },
               {
-                "name": "Problem Description",
+                "name": "Story",
                 "type": "pagev2-grid",
                 "slug": "problem_description",
                 "children": []
