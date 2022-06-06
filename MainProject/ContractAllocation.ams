@@ -64,6 +64,7 @@ Model Main_ContractAllocation {
 				IndexDomain: (i_producer,i_contract);
 				Text: "Unit cost for delivery by producer p for contract c";
 				Unit: $/kg;
+				InitialData: 0;
 				webui::AnnotationsIdentifier: sp_contractsProducersIndexedAnnotation;
 			}
 			Parameter p_minimalDelivery {
@@ -165,6 +166,7 @@ Model Main_ContractAllocation {
 				}
 				Parameter p_solutionTime {
 					Unit: s;
+					InitialData: 0;
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}
 			}
@@ -209,10 +211,12 @@ Model Main_ContractAllocation {
 		ElementParameter ep_actualProducer {
 			Text: "Element parameter used to link Gantt chart with message";
 			Range: s_producers;
+			InitialData: '';
 		}
 		ElementParameter ep_actualContract {
 			Text: "Element parameter used to link Gantt chart with message";
 			Range: s_contracts;
+			InitialData: '';
 		}
 		Section Workflow {
 			StringParameter sp_myWorkflows {
@@ -233,7 +237,7 @@ Model Main_ContractAllocation {
 					  ( '1', '3', 'workflowPageState' ) : "active"             ,  ( '1', '3', 'pageDataState'     ) : "Incomplete"         ,
 					  ( '1', '3', 'redirectPageId'    ) : "home"               ,  ( '1', '4', 'displayText'       ) : "Results"            ,
 					  ( '1', '4', 'icon'              ) : "aimms-make-group"   ,  ( '1', '4', 'pageId'            ) : "results"            ,
-					  ( '1', '4', 'tooltip'           ) : "Model outputs"      ,  ( '1', '4', 'workflowPageState' ) : if (not exists((i_producer,i_contract), v_generation(i_producer,i_contract))) then "inactive" else "active" endif,
+					  ( '1', '4', 'tooltip'           ) : "Model outputs"      ,  ( '1', '4', 'workflowPageState' ) : if (not p_solutionTime) then "inactive" else "active" endif,
 					  ( '1', '4', 'pageDataState'     ) : "Incomplete"         ,  ( '1', '4', 'redirectPageId'    ) : "home"                }
 				}
 			}
@@ -267,10 +271,6 @@ Model Main_ContractAllocation {
 					}
 				}
 				DeclarationSection Input_PageAction {
-					StringParameter sp_inputPrimaryActions {
-						IndexDomain: (webui::indexPageActionSpec);
-						Definition: data { displaytext : "Menu",  icon : "aimms-make-group",  procedure : "pr_empty",  state : "active" };
-					}
 					StringParameter sp_inputSecondaryActions {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
@@ -371,9 +371,22 @@ Model Main_ContractAllocation {
 	}
 	Procedure MainExecution {
 		Body: {
-			solve mp_contractAllocation;
+			if sum((i_producer, i_contract), p_productionCost(i_producer, i_contract)) then
+			    solve mp_contractAllocation;
+			    pr_modelInformation;
 			
-			pr_modelInformation;
+			else 
+			    webui::RequestPerformWebUIDialog(
+			        title   :  "Import First", 
+			        message :  "You are trying to solve without any data, please import first.", 
+			        actions :  s_loc_action,
+			        onDone  : 'webui::NoOp1');   
+			endif;
+		}
+		Set s_loc_action {
+			InitialData: {
+				{'ok'}
+			}
 		}
 	}
 	Procedure PreMainTermination {

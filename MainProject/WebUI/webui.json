@@ -52,15 +52,9 @@
                 "slug": "inputs",
                 "children": [
                   {
-                    "name": "Informations",
-                    "type": "pagev2-grid-sidepanel",
-                    "slug": "informations",
-                    "children": []
-                  },
-                  {
-                    "name": "Model Information",
-                    "type": "pagev2-grid-sidepanel",
-                    "slug": "model_information",
+                    "name": "Solve Consistency",
+                    "type": "pagev2-grid-dialog",
+                    "slug": "solve_consistency",
                     "children": []
                   }
                 ]
@@ -69,7 +63,20 @@
                 "name": "Results",
                 "type": "pagev2-grid",
                 "slug": "results",
-                "children": []
+                "children": [
+                  {
+                    "name": "Model Information",
+                    "type": "pagev2-grid-sidepanel",
+                    "slug": "model_information",
+                    "children": []
+                  },
+                  {
+                    "name": "Informations",
+                    "type": "pagev2-grid-sidepanel",
+                    "slug": "informations",
+                    "children": []
+                  }
+                ]
               }
             ]
           }
@@ -297,25 +304,6 @@
     "layoutId": {
       "literal": "custom_234161e0-a7c2-477f-b278-101c9e62d5e4"
     },
-    "primarypageaction": {
-      "aimms": {
-        "contents": [
-          "sp_inputPrimaryActions"
-        ],
-        "slices": [
-          {
-            "identifier": "sp_inputPrimaryActions",
-            "slice": [
-              {
-                "index": "webui::indexPageActionSpec",
-                "type": "free",
-                "value": "webui::indexPageActionSpec"
-              }
-            ]
-          }
-        ]
-      }
-    },
     "secondarypageactions": {
       "aimms": {
         "contents": [
@@ -493,6 +481,20 @@
           }
         }
       ]
+    }
+  },
+  "pages/solve_consistency": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid-dialog"
+    },
+    "layoutId": {
+      "literal": "Layout11"
+    },
+    "maxcolumns": {
+      "literal": 3
+    },
+    "maxrows": {
+      "literal": 2
     }
   },
   "widgets/bbc_productionCost_1": {
