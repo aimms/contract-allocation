@@ -56,6 +56,7 @@ Model Main_ContractAllocation {
 			Parameter p_availableCapacity {
 				IndexDomain: (i_producer);
 				Text: "Available capacity for producer p";
+				Range: nonnegative;
 				Unit: kg;
 				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
 			}
@@ -68,12 +69,14 @@ Model Main_ContractAllocation {
 			Parameter p_minimalDelivery {
 				IndexDomain: (i_producer);
 				Text: "Minimal delivery size for producer p";
+				Range: nonnegative;
 				Unit: kg;
 				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
 			}
 			Parameter p_contractSize {
 				IndexDomain: (i_contract);
 				Text: "Size of contract c";
+				Range: nonnegative;
 				Unit: kg;
 				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
 			}
@@ -112,18 +115,32 @@ Model Main_ContractAllocation {
 				IndexDomain: (i_contract);
 				Text: "The demand for contract c is met";
 				Unit: kg;
-				Definition: sum(i_producer, v_generation(i_producer,i_contract)) >= p_contractSize(i_contract);
+				Definition: {
+					sum(i_producer, v_generation(i_producer,i_contract)) 
+					>= 
+					p_contractSize(i_contract)
+				}
 			}
 			Constraint c_contractContribution {
 				IndexDomain: (i_contract);
 				Text: "Mimimal number of contributors to contract c";
-				Definition: sum(i_producer, v_generationIncidence(i_producer,i_contract)) >= p_minimalNumberofContributors(i_contract);
+				Definition: {
+					sum(i_producer, v_generationIncidence(i_producer,i_contract)) 
+					>= 
+					p_minimalNumberofContributors(i_contract)
+				}
 			}
 			Constraint c_generationIncidenceDetermination {
 				IndexDomain: (i_producer,i_contract);
 				Text: "Determine if producer p delivers to contract c";
 				Unit: kg;
-				Definition: v_generation(i_producer,i_contract) >= p_minimalDelivery(i_producer) * v_generationIncidence(i_producer,i_contract);
+				Definition: {
+					v_generation(i_producer,i_contract) 
+					>= 
+					p_minimalDelivery(i_producer) 
+					* 
+					v_generationIncidence(i_producer,i_contract)
+				}
 			}
 			MathematicalProgram mp_contractAllocation {
 				Objective: v_totalCost;

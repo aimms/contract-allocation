@@ -4,11 +4,13 @@
 }
 
 /*Change color of the titles*/
-.workflow-panel .step-item.active.complete .title, .workflow-panel .step-item.active.incomplete .title {
+.workflow-panel .step-item.active.complete .title, 
+.workflow-panel .step-item.active.incomplete .title {
   color: var(--primaryDark);
 }
 
 /*Change color of the icons*/
-.workflow-panel .step-item.active.complete .icon, .workflow-panel .step-item.active.incomplete .icon {
+.workflow-panel .step-item.active.complete .icon, 
+.workflow-panel .step-item.active.incomplete .icon {
   color: var(--primaryDark);
 }
