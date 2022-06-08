@@ -6,7 +6,7 @@
 
 **How-to:** https://how-to.aimms.com/Articles/383/383-contract-allocation.html
 
-## Problem Description
+## Story
 
 In this model we have a set of contracts, where every contract represents an amount of commodity that has to be supplied. The objective is to determine which of the producers will take care of which contract such that the total costs are minimal, under the following conditions:
 
