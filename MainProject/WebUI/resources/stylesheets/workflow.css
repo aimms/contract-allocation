@@ -13,4 +13,6 @@
 .workflow-panel .step-item.active.complete .icon, 
 .workflow-panel .step-item.active.incomplete .icon {
   color: var(--primaryDark);
+  border: 1px solid var(--primaryDark);
 }
+

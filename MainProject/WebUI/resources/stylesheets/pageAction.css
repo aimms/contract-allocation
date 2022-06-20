@@ -1,0 +1,20 @@
+
+.page-action-v2 .page-action-menu,
+.page-action-v2 .page-action-menu.open {
+  background: var(--primaryDark);
+}
+
+.page-action-v2 .page-action-menu:hover,
+.page-action-v2 .page-action-menu:hover {
+  background: var(--primary);
+}
+
+.page-action-v2 .page-action-holder .page-action-item .page-action-icon, 
+.page-action-v2 .page-action-holder .page-action-item .page-action-letter {
+  background-color: var(--primaryDark);
+}
+
+.page-action-v2 .page-action-holder .page-action-item .page-action-icon:hover, 
+.page-action-v2 .page-action-holder .page-action-item .page-action-letter:hover {
+  background-color: var(--primary);
+}
