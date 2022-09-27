@@ -372,9 +372,16 @@ Model Main_ContractAllocation {
 	Procedure MainExecution {
 		Body: {
 			if sum((i_producer, i_contract), p_productionCost(i_producer, i_contract)) then
-			    solve mp_contractAllocation;
+			    if pro::GetPROEndPoint() then
+				    if pro::management::IsRunningOnCloud() then
+					    pro::solverlease::solveModel(
+				            mathematicalProgrammingProblem :  'mp_contractAllocation', 
+				            jobDescription                 :  "Contract Allocation");
+			        endif;
+			    else
+			        solve mp_contractAllocation;
+			    endif;
 			    pr_modelInformation;
-			
 			else 
 			    webui::RequestPerformWebUIDialog(
 			        title   :  "Import First", 
