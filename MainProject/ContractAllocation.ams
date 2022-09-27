@@ -166,6 +166,7 @@ Model Main_ContractAllocation {
 				}
 				Parameter p_solutionTime {
 					Unit: s;
+					Property: NoSave;
 					InitialData: 0;
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}

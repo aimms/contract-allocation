@@ -21,6 +21,12 @@
 
 /*Change the color below sidepanel tabs*/
 .sidepanel-container {
-  background-color: rgba(249, 249, 249, 0.438)
+  background-color:   rgb(249, 249, 249);
+
 }
+
+.sidepanel-active .sidepanel-container {
+  background-color:   rgba(249, 249, 249, 0);
+}
+
 
