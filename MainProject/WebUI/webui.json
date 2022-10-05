@@ -75,6 +75,12 @@
                     "type": "pagev2-grid-sidepanel",
                     "slug": "informations",
                     "children": []
+                  },
+                  {
+                    "name": "Export page",
+                    "type": "pagev2-grid-dialog",
+                    "slug": "export_page",
+                    "children": []
                   }
                 ]
               }
@@ -229,6 +235,55 @@
     },
     "displayName": {
       "literal": "LayoutInputs"
+    }
+  },
+  "pages/export_page": {
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "selectExportMapping",
+          "gridArea": "area-a",
+          "dndId": "area-aselectExportMapping0"
+        },
+        {
+          "widgetUri": "exportedFileName_1",
+          "gridArea": "area-a",
+          "dndId": "area-aexportedFileName_12"
+        },
+        {
+          "widgetUri": "downloadExportedData",
+          "gridArea": "area-a",
+          "dndId": "area-adownloadExportedData1"
+        }
+      ]
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "downloadExportedData",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "exportedFileName_1",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "selectExportMapping",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    },
+    "aimms.widget.type": {
+      "literal": "pagev2-grid-dialog"
     }
   },
   "pages/home": {
@@ -475,6 +530,30 @@
           "dndId": "area-bcbc_generation1"
         }
       ]
+    },
+    "secondarypageactions": {
+      "aimms": {
+        "contents": [
+          "sp_resultsSecondaryActions"
+        ],
+        "slices": [
+          {
+            "identifier": "sp_resultsSecondaryActions",
+            "slice": [
+              {
+                "index": "webui::indexPageExtension",
+                "type": "free",
+                "value": "webui::indexPageExtension"
+              },
+              {
+                "index": "webui::indexPageActionSpec",
+                "type": "free",
+                "value": "webui::indexPageActionSpec"
+              }
+            ]
+          }
+        ]
+      }
     },
     "sidepanels": {
       "aimms": {
@@ -877,6 +956,38 @@
       "literal": "Contract Alocation"
     }
   },
+  "widgets/downloadExportedData": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "pr_exportExcelData"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "download"
+    },
+    "name": {
+      "literal": "downloadExportedData"
+    }
+  },
+  "widgets/exportedFileName_1": {
+    "aimms.widget.type": {
+      "literal": "scalar"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "sp_fileName"
+        ]
+      }
+    },
+    "multi.line": {
+      "literal": 0
+    },
+    "name": {
+      "literal": "exportedFileName"
+    }
+  },
   "widgets/img_homeLogo": {
     "aimms.widget.type": {
       "literal": "image"
@@ -1064,6 +1175,22 @@
     },
     "name": {
       "literal": "scl_modelInformation"
+    }
+  },
+  "widgets/selectExportMapping": {
+    "aimms.widget.type": {
+      "literal": "selectionbox-v2"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "ep_selectedMapping"
+        ],
+        "slices": []
+      }
+    },
+    "name": {
+      "literal": "selectExportMapping"
     }
   },
   "widgets/tbl_contractsInformation": {

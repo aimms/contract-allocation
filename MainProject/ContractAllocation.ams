@@ -47,6 +47,7 @@ Model Main_ContractAllocation {
 			Set s_producers {
 				Text: "The set of all producers";
 				Index: i_producer;
+				dex::FieldName: Producer;
 			}
 			Set s_contracts {
 				Text: "The set of all contracts";
@@ -184,18 +185,125 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Outputs {
+			Procedure pr_exportExcelData {
+				Arguments: (FileLocation,statusCode,statusDescription);
+				Body: {
+					! writing the output file locally
+					dex::WriteToFile(
+					    dataFile    :  sp_FileName, 
+						mappingName :  ep_selectedMapping, 
+						pretty      :  1);
+					
+					! we want to download a file
+					FileLocation := sp_FileName;
+					
+					! we store the location of the file in string parameter FinalLocation
+					FinalLocation := webui::GetIOFilePath(FileLocation);
+					
+					! checking if the previous write statement was successful or not
+					if FileExists(FinalLocation) then
+					
+					   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
+					   StatusCode := webui::ReturnStatusCode('CREATED');
+					   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
+					   StatusDescription := "Ready to download exported data!";
+					
+					else    !if previous write statement was not successful
+					
+					   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
+					   statusCode := webui::ReturnStatusCode('ERROR');
+					   !displaying a custom error message
+					   statusDescription := "Something went wrong when creating the file.";
+					
+					endif;
+				}
+				StringParameter FileLocation {
+					Property: Output;
+				}
+				StringParameter FinalLocation;
+				Parameter statusCode {
+					Property: Output;
+				}
+				StringParameter statusDescription {
+					Property: Output;
+				}
+			}
+			Procedure pr_openExportPage {
+				Body: {
+					!Generating all possible mappings
+					dex::GenerateDatasetMappings();
+					
+					!Selecting the Excel mapping as initial value
+					if not ep_selectedMapping then
+					    ep_selectedMapping 
+					    :=  First(i_generatedMappings | FindString(
+					            SearchString  :  i_generatedMappings, 
+					            Key           :  "excel", 
+					            CaseSensitive :  0, 
+					            WordOnly      :  0, 
+					            IgnoreWhite   :  0));
+					endif;
+					
+					!Defining Dialog and actions - Only done required
+					s_actions:= data { Done };
+					ep_pageId := 'export_page';
+					
+					!Opening dialog page - no action on done - webui::NoOp1 does nothing
+					webui::OpenDialogPage(
+						pageId  :  ep_pageId, 
+						title   :  "Export data", 
+					    actions :  s_actions, 
+						onDone  :  'webui::NoOp1');
+				}
+				Set s_actions;
+				ElementParameter ep_pageId {
+					Range: webui::AllDialogPages;
+				}
+			}
+			Index i_contractExport {
+				Range: s_contracts;
+				Comment: "Used to define column name in export process";
+				dex::ColumnName: Contract;
+			}
+			Index i_producerExport {
+				Range: s_producers;
+				Comment: "Used to define column name in export process";
+				dex::ColumnName: Producer;
+			}
+			Parameter p_generation {
+				IndexDomain: (i_producerExport, i_contractExport);
+				Unit: kg;
+				Definition: v_generation(i_producerExport, i_contractExport);
+				dex::ColumnName: Generation;
+				dex::Dataset: Export;
+				dex::TableName: Allocation per Producer;
+			}
+			Parameter p_totalGeneration {
+				IndexDomain: i_contractExport;
+				Unit: kg;
+				Definition: sum(i_producerExport, p_generation(i_producerExport, i_contractExport));
+				dex::ColumnName: Total Generation;
+				dex::Dataset: Export;
+				dex::TableName: Contract Allocation;
+			}
 			Parameter p_slackAllocation {
-				IndexDomain: i_contract;
+				IndexDomain: i_contractExport;
 				Unit: kg;
 				Definition: {
-					p_contractSize(i_contract) 
-					- sum(i_producer, v_generation(i_producer, i_contract))
+					p_contractSize(i_contractExport) 
+					- sum(i_producerExport, v_generation(i_producerExport, i_contractExport))
 				}
-				webui::AnnotationsIdentifier: sp_slackAllocationAnnotation(i_contract);
+				dex::ColumnName: Slack;
+				dex::Dataset: Export;
+				dex::TableName: Contract Allocation;
+				webui::AnnotationsIdentifier: sp_slackAllocationAnnotation(i_contractExport);
 			}
 			StringParameter sp_slackAllocationAnnotation {
-				IndexDomain: i_contract | p_slackAllocation(i_contract);
-				Definition: "hassomeslack";
+				IndexDomain: i_contractExport | p_slackAllocation(i_contractExport);
+				Definition: "has some slack";
+				dex::ColumnName: Slack comment;
+				dex::Dataset: Export;
+				dex::TableName: Contract Allocation;
 			}
 			Parameter p_disaggregatedCost {
 				IndexDomain: (i_producer,i_contract);
@@ -352,6 +460,35 @@ Model Main_ContractAllocation {
 							( '2', '4', 'color' ) : "black",
 							( '2', '4', 'text'  ) : "Otherwise.",
 							(' 2', '4', 'state' ) : "active" }
+						}
+					}
+				}
+				DeclarationSection Export_Page {
+					StringParameter sp_fileName {
+						Default: "Your File Name Here.xlsx";
+						Comment: "file name of exported data";
+					}
+					ElementParameter ep_selectedMapping {
+						Range: s_generatedMappings;
+						Default: '';
+						Comment: "selected generated mapping for export";
+					}
+					Set s_generatedMappings {
+						SubsetOf: dex::Mappings;
+						Index: i_generatedMappings;
+						Definition: {
+							{dex::map | FindString(dex::map, "Generated/",CaseSensitive :  1, WordOnly      :  0)}
+						}
+						Comment: "all generated selected mappings";
+					}
+				}
+				DeclarationSection Results_PageAction {
+					StringParameter sp_resultsSecondaryActions {
+						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
+						Definition: {
+							data 
+							{ ( 1, displaytext ) : "Export"            ,  ( 1, icon        ) : "aimms-file-download"  ,
+							  ( 1, procedure   ) : "pr_openExportPage",  ( 1, state       ) : "active"            }
 						}
 					}
 				}
