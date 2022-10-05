@@ -2,4 +2,9 @@
   --primary: #3DDAB4;
   --primaryDark: #00B569;
   --primary90Transparent: #3ddab33b;
+
+
+  --color_bg_button_primary: var(--primaryDark);
+  --color_bg_button_primary_hover: var(--primary);
+  --color_text_edit-select-link: var(--primaryDark);
 }

@@ -228,38 +228,6 @@ Model Main_ContractAllocation {
 					Property: Output;
 				}
 			}
-			Procedure pr_openExportPage {
-				Body: {
-					!Generating all possible mappings
-					dex::GenerateDatasetMappings();
-					
-					!Selecting the Excel mapping as initial value
-					if not ep_selectedMapping then
-					    ep_selectedMapping 
-					    :=  First(i_generatedMappings | FindString(
-					            SearchString  :  i_generatedMappings, 
-					            Key           :  "excel", 
-					            CaseSensitive :  0, 
-					            WordOnly      :  0, 
-					            IgnoreWhite   :  0));
-					endif;
-					
-					!Defining Dialog and actions - Only done required
-					s_actions:= data { Done };
-					ep_pageId := 'export_page';
-					
-					!Opening dialog page - no action on done - webui::NoOp1 does nothing
-					webui::OpenDialogPage(
-						pageId  :  ep_pageId, 
-						title   :  "Export data", 
-					    actions :  s_actions, 
-						onDone  :  'webui::NoOp1');
-				}
-				Set s_actions;
-				ElementParameter ep_pageId {
-					Range: webui::AllDialogPages;
-				}
-			}
 			Index i_contractExport {
 				Range: s_contracts;
 				Comment: "Used to define column name in export process";
@@ -384,7 +352,7 @@ Model Main_ContractAllocation {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
 							data 
-							{ ( 1, displaytext ) : "Import"            ,  ( 1, icon        ) : "aimms-file-excel"  ,
+							{ ( 1, displaytext ) : "Import"            ,  ( 1, icon        ) : "aimms-file-upload"  ,
 							  ( 1, procedure   ) : "pr_importExcelData",  ( 1, state       ) : "active"            ,
 							  ( 2, displaytext ) : "Solve"             ,  ( 2, icon        ) : "aimms-cog"         ,
 							  ( 2, procedure   ) : "mainexecution"     ,  ( 2, state       ) : "active"             }
@@ -393,6 +361,38 @@ Model Main_ContractAllocation {
 				}
 			}
 			Section Results_Page {
+				Procedure pr_openExportPage {
+					Body: {
+						!Generating all possible mappings
+						dex::GenerateDatasetMappings();
+						
+						!Selecting the Excel mapping as initial value
+						if not ep_selectedMapping then
+						    ep_selectedMapping 
+						    :=  First(i_generatedMappings | FindString(
+						            SearchString  :  i_generatedMappings, 
+						            Key           :  "excel", 
+						            CaseSensitive :  0, 
+						            WordOnly      :  0, 
+						            IgnoreWhite   :  0));
+						endif;
+						
+						!Defining Dialog and actions - Only done required
+						s_actions:= data { Done };
+						ep_pageId := 'export_page';
+						
+						!Opening dialog page - no action on done - webui::NoOp1 does nothing
+						webui::OpenDialogPage(
+							pageId  :  ep_pageId, 
+							title   :  "Export data", 
+						    actions :  s_actions, 
+							onDone  :  'webui::NoOp1');
+					}
+					Set s_actions;
+					ElementParameter ep_pageId {
+						Range: webui::AllDialogPages;
+					}
+				}
 				StringParameter sp_messageString {
 					Text: "A message describing the production of a certain producer for a certain contract";
 					Definition: {
@@ -463,7 +463,7 @@ Model Main_ContractAllocation {
 						}
 					}
 				}
-				DeclarationSection Export_Page {
+				DeclarationSection Export_Dialog {
 					StringParameter sp_fileName {
 						Default: "Your File Name Here.xlsx";
 						Comment: "file name of exported data";
