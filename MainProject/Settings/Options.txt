@@ -4,17 +4,20 @@ use_UTC_forCaseAndStartEndDate 1
 * BARON 21
 * CBC 2.9
 * CONOPT 4.1
+* CPLEX 12.10
 * CPLEX 22.1
 * CPOptimizer 22.1
 * GUROBI 9.5
 * IPOPT 3.11
 * Knitro 12.3
+* Knitro 13.1
 * MINOS
 * ODH-CPLEX 5.3
-* Octeract 4.2
+* Octeract 4.3
 * PATH 4.7
 * SNOPT 7.2
 * NETSOL
 * Environment
+Project_Title "Contract Allocation"
 Default_UI 0
 Open_WebUI_on_Startup 1

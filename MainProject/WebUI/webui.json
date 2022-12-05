@@ -50,14 +50,7 @@
                 "name": "Inputs",
                 "type": "pagev2-grid",
                 "slug": "inputs",
-                "children": [
-                  {
-                    "name": "Solve Consistency",
-                    "type": "pagev2-grid-dialog",
-                    "slug": "solve_consistency",
-                    "children": []
-                  }
-                ]
+                "children": []
               },
               {
                 "name": "Results",
@@ -596,20 +589,6 @@
           }
         }
       ]
-    }
-  },
-  "pages/solve_consistency": {
-    "aimms.widget.type": {
-      "literal": "pagev2-grid-dialog"
-    },
-    "layoutId": {
-      "literal": "Layout11"
-    },
-    "maxcolumns": {
-      "literal": 3
-    },
-    "maxrows": {
-      "literal": 2
     }
   },
   "widgets/bbc_productionCost_1": {
@@ -1422,14 +1401,6 @@
     },
     "title": {
       "literal": "Production Cost"
-    }
-  },
-  "widgets/teste": {
-    "aimms.widget.type": {
-      "literal": "selectionbox-v2"
-    },
-    "name": {
-      "literal": "teste"
     }
   },
   "widgets/txt_problemDescription": {
