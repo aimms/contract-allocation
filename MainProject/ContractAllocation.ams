@@ -302,20 +302,21 @@ Model Main_ContractAllocation {
 			StringParameter sp_myWorkflowSteps {
 				IndexDomain: (webui::indexWorkflowOrder,webui::indexNoOfPages,webui::indexWorkflowPageSpec);
 				Definition: {
-					{ ( '1', '1', 'displayText'       ) : "Welcome"            ,  ( '1', '1', 'icon'              ) : "aimms-happy"        ,
-					  ( '1', '1', 'pageId'            ) : "home"               ,  ( '1', '1', 'tooltip'           ) : "welcome"            ,
-					  ( '1', '1', 'workflowPageState' ) : "active"             ,  ( '1', '1', 'pageDataState'     ) : "Incomplete"         ,
-					  ( '1', '1', 'redirectPageId'    ) : "home"               ,  ( '1', '2', 'displayText'       ) : "Story"              ,
-					  ( '1', '2', 'icon'              ) : "aimms-lamp5"        ,  ( '1', '2', 'pageId'            ) : "problem_description",
-					  ( '1', '2', 'tooltip'           ) : "Problem description",  ( '1', '2', 'workflowPageState' ) : "active"             ,
-					  ( '1', '2', 'pageDataState'     ) : "Incomplete"         ,  ( '1', '2', 'redirectPageId'    ) : "home"               ,
-					  ( '1', '3', 'displayText'       ) : "Inputs"             ,  ( '1', '3', 'icon'              ) : "aimms-equalizer2"   ,
-					  ( '1', '3', 'pageId'            ) : "inputs"             ,  ( '1', '3', 'tooltip'           ) : "Input data"         ,
-					  ( '1', '3', 'workflowPageState' ) : "active"             ,  ( '1', '3', 'pageDataState'     ) : "Incomplete"         ,
-					  ( '1', '3', 'redirectPageId'    ) : "home"               ,  ( '1', '4', 'displayText'       ) : "Results"            ,
-					  ( '1', '4', 'icon'              ) : "aimms-make-group"   ,  ( '1', '4', 'pageId'            ) : "results"            ,
-					  ( '1', '4', 'tooltip'           ) : "Model outputs"      ,  ( '1', '4', 'workflowPageState' ) : if (not p_solutionTime) then "inactive" else "active" endif,
-					  ( '1', '4', 'pageDataState'     ) : "Incomplete"         ,  ( '1', '4', 'redirectPageId'    ) : "home"                }
+					data 
+					{ ( 1, 1, displayText       ) : "Welcome"            ,  ( 1, 1, icon              ) : "aimms-happy"        ,
+					  ( 1, 1, pageId            ) : "home"               ,  ( 1, 1, tooltip           ) : "welcome"            ,
+					  ( 1, 1, workflowPageState ) : "active"             ,  ( 1, 1, pageDataState     ) : "Incomplete"         ,
+					  ( 1, 1, redirectPageId    ) : "home"               ,  ( 1, 2, displayText       ) : "Story"              ,
+					  ( 1, 2, icon              ) : "aimms-lamp5"        ,  ( 1, 2, pageId            ) : "problem_description",
+					  ( 1, 2, tooltip           ) : "Problem description",  ( 1, 2, workflowPageState ) : "active"             ,
+					  ( 1, 2, pageDataState     ) : "incomplete"         ,  ( 1, 2, redirectPageId    ) : "home"               ,
+					  ( 1, 3, displayText       ) : "Inputs"             ,  ( 1, 3, icon              ) : "aimms-equalizer2"   ,
+					  ( 1, 3, pageId            ) : "inputs"             ,  ( 1, 3, tooltip           ) : "Input data"         ,
+					  ( 1, 3, workflowPageState ) : "active"             ,  ( 1, 3, pageDataState     ) : "incomplete"         ,
+					  ( 1, 3, redirectPageId    ) : "home"               ,  ( 1, 4, displayText       ) : "Results"            ,
+					  ( 1, 4, icon              ) : "aimms-make-group"   ,  ( 1, 4, pageId            ) : "results"            ,
+					  ( 1, 4, tooltip           ) : "Model outputs"      ,  ( 1, 4, workflowPageState ) : "active"             ,
+					  ( 1, 4, pageDataState     ) : "Incomplete"         ,  ( 1, 4, redirectPageId    ) : "home"                }
 				}
 			}
 		}
@@ -384,7 +385,7 @@ Model Main_ContractAllocation {
 						!Opening dialog page - no action on done - webui::NoOp1 does nothing
 						webui::OpenDialogPage(
 							pageId  :  ep_pageId, 
-							title   :  "Export data", 
+							title   :  "Export Data", 
 						    actions :  s_actions, 
 							onDone  :  'webui::NoOp1');
 					}

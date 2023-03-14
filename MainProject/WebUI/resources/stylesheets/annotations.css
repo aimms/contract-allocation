@@ -1,5 +1,6 @@
 .annotation-bkg-lightblue {
   background: var(--primary90Transparent);
+  color: red;
 }
 
 .annotation-hassomeslack {

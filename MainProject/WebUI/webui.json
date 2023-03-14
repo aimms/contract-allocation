@@ -18,12 +18,18 @@
         ]
       }
     },
+    "data.manager.hidden": {
+      "literal": true
+    },
     "ignoredst": {
       "aimms": {
         "contents": [
           "webui::IgnoreDST"
         ]
       }
+    },
+    "menu.hidden": {
+      "literal": true
     },
     "pages": {
       "literal": {
@@ -194,7 +200,7 @@
       "literal": {
         "componentName": "Grid",
         "props": {
-          "gridTemplateColumns": "0.3fr 0.3fr 0.4fr",
+          "gridTemplateColumns": "0.5fr 0.3fr 0.3fr",
           "gridTemplateRows": "1fr",
           "gridTemplateAreas": "\"area-a area-b area-c\""
         },
@@ -707,7 +713,7 @@
       }
     },
     "contents.0.show.units": {
-      "literal": false
+      "literal": true
     },
     "contents.1.chart.axis.y.select": {
       "literal": "secondary_axis"
@@ -766,11 +772,17 @@
     },
     "name": {
       "literal": "cbc_contractsInformation"
+    },
+    "transparency.index": {
+      "literal": "i_contract"
     }
   },
   "widgets/cbc_costPerProducer": {
     "aimms.widget.type": {
       "literal": "combinationchart"
+    },
+    "color.index": {
+      "literal": "<IDENTIFIER-SET>"
     },
     "contents.__display_order__": {
       "literal": [
@@ -838,6 +850,9 @@
   "widgets/cbc_generation": {
     "aimms.widget.type": {
       "literal": "combinationchart"
+    },
+    "color.index": {
+      "literal": "<IDENTIFIER-SET>"
     },
     "contents.__display_order__": {
       "literal": [
@@ -1231,6 +1246,11 @@
     "show.units": {
       "literal": 1
     },
+    "store.focus.in": {
+      "literal": {
+        "i_contract": "ep_actualContract"
+      }
+    },
     "title": {
       "literal": "Contract Information"
     }
@@ -1281,6 +1301,11 @@
     },
     "show.units": {
       "literal": 1
+    },
+    "store.focus.in": {
+      "literal": {
+        "i_producer": "ep_actualProducer"
+      }
     },
     "title": {
       "literal": "Producers Information"
@@ -1398,6 +1423,12 @@
     },
     "show.units": {
       "literal": 1
+    },
+    "store.focus.in": {
+      "literal": {
+        "i_producer": "ep_actualProducer",
+        "i_contract": "ep_actualContract"
+      }
     },
     "title": {
       "literal": "Production Cost"

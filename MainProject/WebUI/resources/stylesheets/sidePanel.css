@@ -29,4 +29,6 @@
   background-color:   rgba(249, 249, 249, 0);
 }
 
-
+.sidepanel-container .sidepanel-tab {
+  height: 180px;
+}
