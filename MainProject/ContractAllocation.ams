@@ -44,49 +44,57 @@ Model Main_ContractAllocation {
 					ep_actualProducer := first(i_producer);
 				}
 			}
-			Set s_producers {
-				Text: "The set of all producers";
-				Index: i_producer;
-				dex::FieldName: Producer;
+			Section Producers {
+				Set s_producers {
+					Text: "The set of all producers";
+					Index: i_producer;
+					dex::FieldName: Producer;
+				}
+				Parameter p_availableCapacity {
+					IndexDomain: (i_producer);
+					Text: "Available capacity for producer p";
+					Range: nonnegative;
+					Unit: kg;
+					webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
+				}
+				Parameter p_minimalDelivery {
+					IndexDomain: (i_producer);
+					Text: "Minimal delivery size for producer p";
+					Range: nonnegative;
+					Unit: kg;
+					webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
+				}
 			}
-			Set s_contracts {
-				Text: "The set of all contracts";
-				Index: i_contract, i_contract1;
-				Parameter: ep_contract;
+			Section Contracts {
+				Set s_contracts {
+					Text: "The set of all contracts";
+					Index: i_contract, i_contract1;
+					Parameter: ep_contract;
+				}
+				Parameter p_contractSize {
+					IndexDomain: (i_contract);
+					Text: "Size of contract c";
+					Range: nonnegative;
+					Unit: kg;
+					InitialData: 0;
+					webui::AnnotationsIdentifier: sp_contractSizeAnnotation;
+				}
+				Parameter p_minimalNumberofContributors {
+					IndexDomain: (i_contract);
+					Text: "Minimal number of producers that delivery to a contract";
+					Range: integer;
+					InitialData: 0;
+					webui::AnnotationsIdentifier: sp_minimalNumberofContributorsAnnotation;
+				}
 			}
-			Parameter p_availableCapacity {
-				IndexDomain: (i_producer);
-				Text: "Available capacity for producer p";
-				Range: nonnegative;
-				Unit: kg;
-				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
-			}
-			Parameter p_productionCost {
-				IndexDomain: (i_producer,i_contract);
-				Text: "Unit cost for delivery by producer p for contract c";
-				Unit: $/kg;
-				InitialData: 0;
-				webui::AnnotationsIdentifier: sp_contractsProducersIndexedAnnotation;
-			}
-			Parameter p_minimalDelivery {
-				IndexDomain: (i_producer);
-				Text: "Minimal delivery size for producer p";
-				Range: nonnegative;
-				Unit: kg;
-				webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
-			}
-			Parameter p_contractSize {
-				IndexDomain: (i_contract);
-				Text: "Size of contract c";
-				Range: nonnegative;
-				Unit: kg;
-				webui::AnnotationsIdentifier: sp_contractSizeAnnotation;
-			}
-			Parameter p_minimalNumberofContributors {
-				IndexDomain: (i_contract);
-				Text: "Minimal number of producers that delivery to a contract";
-				Range: integer;
-				webui::AnnotationsIdentifier: sp_minimalNumberofContributorsAnnotation;
+			DeclarationSection Production_Cost {
+				Parameter p_productionCost {
+					IndexDomain: (i_producer,i_contract);
+					Text: "Unit cost for delivery by producer p for contract c";
+					Unit: $/kg;
+					InitialData: 0;
+					webui::AnnotationsIdentifier: sp_contractsProducersIndexedAnnotation;
+				}
 			}
 		}
 		Section Math_Model {
@@ -278,6 +286,33 @@ Model Main_ContractAllocation {
 				Unit: $;
 				Definition: p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract);
 			}
+			Section by_Cost {
+				Parameter p_def_actualnumberOfContributors {
+					IndexDomain: i_contract;
+					Definition: sum(i_producer | v_generation(i_producer, i_contract), 1);
+				}
+				Parameter p_def_minNumberOfContributors {
+					IndexDomain: i_contract;
+					Definition: p_minimalNumberofContributors(i_contract);
+				}
+			}
+			Section by_Size {
+				Parameter p_def_totalDelivery {
+					IndexDomain: i_producer;
+					Unit: kg;
+					Definition: sum(i_contract, v_generation(i_producer,i_contract));
+				}
+				Parameter p_def_availableCapacity {
+					IndexDomain: i_producer;
+					Unit: kg;
+					Definition: p_availableCapacity(i_producer);
+				}
+				Parameter p_def_minimalDelivery {
+					IndexDomain: i_producer;
+					Unit: kg;
+					Definition: p_minimalDelivery(i_producer);
+				}
+			}
 		}
 	}
 	Section UI_Declarations {
@@ -327,7 +362,7 @@ Model Main_ContractAllocation {
 						IndexDomain: i_producer;
 						Definition: {
 							if i_producer = ep_actualProducer then
-								"bkg-lightblue"
+								"bkg-cell"
 							endif
 						}
 					}

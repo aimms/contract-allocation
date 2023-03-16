@@ -236,6 +236,55 @@
       "literal": "LayoutInputs"
     }
   },
+  "layouts/custom_4def2f91-d433-450e-8176-4c1a0af75917": {
+    "definition": {
+      "literal": {
+        "componentName": "Grid",
+        "props": {
+          "gridTemplateColumns": "2fr 2fr 1fr 1fr",
+          "gridTemplateRows": "1fr 1fr",
+          "gridTemplateAreas": "\"area-a area-a area-a area-c\" \"area-d area-d area-b area-b\""
+        },
+        "items": [
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-a",
+              "name": "Area A",
+              "gridAutoFlow": "column"
+            }
+          },
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-b",
+              "name": "Area B",
+              "gridAutoFlow": "row"
+            }
+          },
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-c",
+              "name": "Area C",
+              "gridAutoFlow": "row"
+            }
+          },
+          {
+            "componentName": "WidgetArea",
+            "props": {
+              "gridArea": "area-d",
+              "name": "Area D",
+              "gridAutoFlow": "column"
+            }
+          }
+        ]
+      }
+    },
+    "displayName": {
+      "literal": "Layout8 Copy"
+    }
+  },
   "pages/export_page": {
     "aimms.widget.type": {
       "literal": "pagev2-grid-dialog"
@@ -519,16 +568,29 @@
     "bindings": {
       "literal": [
         {
-          "widgetUri": "cbc_costPerProducer",
-          "gridArea": "area-a",
-          "dndId": "Unassigned widgetscbc_costPerProducer2"
+          "widgetUri": "tbl_allocation",
+          "gridArea": "area-b",
+          "dndId": "area-dtbl_allocation2"
+        },
+        {
+          "widgetUri": "tbl_numContributors",
+          "gridArea": "area-c",
+          "dndId": "area-ctbl_numContributors0"
         },
         {
           "widgetUri": "cbc_generation",
-          "gridArea": "area-b",
-          "dndId": "area-bcbc_generation1"
+          "gridArea": "area-d",
+          "dndId": "area-dcbc_generation1"
+        },
+        {
+          "widgetUri": "cbc_costPerProducer",
+          "gridArea": "area-a",
+          "dndId": "area-acbc_costPerProducer3"
         }
       ]
+    },
+    "layoutId": {
+      "literal": "custom_4def2f91-d433-450e-8176-4c1a0af75917"
     },
     "secondarypageactions": {
       "aimms": {
@@ -589,6 +651,20 @@
         },
         {
           "uri": "cbc_costPerProducer",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "tbl_allocation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "tbl_numContributors",
           "layoutInfo": {
             "width": "2",
             "height": "1"
@@ -781,6 +857,12 @@
     "aimms.widget.type": {
       "literal": "combinationchart"
     },
+    "axis.y.0.step": {
+      "literal": 500
+    },
+    "color.index": {
+      "literal": "<IDENTIFIER-SET>"
+    },
     "contents.__display_order__": {
       "literal": [
         "contents.0"
@@ -826,6 +908,12 @@
         ]
       }
     },
+    "contents.show.units": {
+      "literal": false
+    },
+    "data.interpolate": {
+      "literal": false
+    },
     "data.labels.show": {
       "literal": true
     },
@@ -841,7 +929,7 @@
       "literal": "cbc_allocatedCosts"
     },
     "title": {
-      "literal": "Allocated Costs"
+      "literal": "Allocated Costs per Contract"
     }
   },
   "widgets/cbc_generation": {
@@ -882,8 +970,8 @@
         "identifier": "p_slackAllocation",
         "slice": [
           {
-            "index": "i_contract",
-            "type": "free",
+            "index": "i_contractExport",
+            "type": "subset",
             "value": "i_contract"
           }
         ]
@@ -902,6 +990,7 @@
           "i_producer"
         ],
         "aggregated": [
+          "i_contractExport",
           "<IDENTIFIER-SET>"
         ]
       }
@@ -944,7 +1033,7 @@
       "literal": "cbc_generation"
     },
     "title": {
-      "literal": "Contract Alocation"
+      "literal": "Contract Allocation"
     }
   },
   "widgets/downloadExportedData": {
@@ -1184,6 +1273,59 @@
       "literal": "selectExportMapping"
     }
   },
+  "widgets/tbl_allocation": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "p_def_minimalDelivery",
+          "p_def_totalDelivery",
+          "p_def_availableCapacity"
+        ]
+      }
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "i_producer"
+        ],
+        "colHeader": [
+          "i_contract",
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "contents.totals": {
+      "literal": [
+        {
+          "indexName": "i_contract",
+          "operators": [
+            "sum_only_visible"
+          ]
+        }
+      ]
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "colHeader",
+          "colKey": {
+            "i_contract": "sum_only_visible"
+          },
+          "width": 17.98
+        }
+      ]
+    },
+    "default.column.width": {
+      "literal": 13
+    },
+    "name": {
+      "literal": "tbl_allocation"
+    }
+  },
   "widgets/tbl_contractsInformation": {
     "aimms.widget.type": {
       "literal": "table"
@@ -1250,6 +1392,54 @@
     },
     "title": {
       "literal": "Contract Information"
+    }
+  },
+  "widgets/tbl_numContributors": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "p_def_minNumberOfContributors",
+          "p_def_actualnumberOfContributors"
+        ]
+      }
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "i_contract"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_minNumberOfContributors"
+          },
+          "width": 14.58
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_actualnumberOfContributors"
+          },
+          "width": 16.45
+        }
+      ]
+    },
+    "name": {
+      "literal": "tbl_numContributors"
+    },
+    "title": {
+      "literal": "Number of Contributors"
     }
   },
   "widgets/tbl_producersInformation": {
