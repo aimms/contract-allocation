@@ -80,13 +80,13 @@ Model Main_ContractAllocation {
 				Text: "Size of contract c";
 				Range: nonnegative;
 				Unit: kg;
-				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
+				webui::AnnotationsIdentifier: sp_contractSizeAnnotation;
 			}
 			Parameter p_minimalNumberofContributors {
 				IndexDomain: (i_contract);
 				Text: "Minimal number of producers that delivery to a contract";
 				Range: integer;
-				webui::AnnotationsIdentifier: sp_contractsIndexedAnnotation;
+				webui::AnnotationsIdentifier: sp_minimalNumberofContributorsAnnotation;
 			}
 		}
 		Section Math_Model {
@@ -331,11 +331,40 @@ Model Main_ContractAllocation {
 							endif
 						}
 					}
-					StringParameter sp_contractsIndexedAnnotation {
+					StringParameter sp_minimalNumberofContributorsAnnotation {
 						IndexDomain: i_contract;
 						Definition: {
-							if i_contract = ep_actualContract then
-								"bkg-lightblue"
+							if (i_contract = ep_actualContract
+							    and p_minimalNumberofContributors(ep_actualContract) = 0) then
+								"bkg-cell-default"
+							
+							elseif (i_contract = ep_actualContract
+							    and p_minimalNumberofContributors(ep_actualContract) <> 0) then
+								"bkg-cell"
+							
+							endif
+						}
+						Comment: {
+							"or  
+							    (i_contract = ep_actualContract
+							    and p_contractSize(ep_actualContract) = 0[kg]) 
+							
+							    or  
+							    (i_contract = ep_actualContract
+							    and p_contractSize(ep_actualContract) <> 0[kg])"
+						}
+					}
+					StringParameter sp_contractSizeAnnotation {
+						IndexDomain: i_contract;
+						Definition: {
+							if (i_contract = ep_actualContract
+							    and p_contractSize(ep_actualContract) = 0[kg]) then
+								"bkg-cell-default"
+							
+							elseif (i_contract = ep_actualContract
+							    and p_contractSize(ep_actualContract) <> 0[kg]) then
+								"bkg-cell"
+							
 							endif
 						}
 					}
@@ -343,7 +372,7 @@ Model Main_ContractAllocation {
 						IndexDomain: (i_producer,i_contract);
 						Definition: {
 							if i_contract = ep_actualContract and i_producer = ep_actualProducer then
-								"bkg-lightblue"
+								"bkg-cell"
 							endif
 						}
 					}

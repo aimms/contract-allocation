@@ -1,10 +1,11 @@
-.annotation-bkg-lightblue {
+.annotation-bkg-cell {
   background: var(--primary90Transparent);
-  color: red;
 }
 
-.annotation-hassomeslack {
-	fill:white; 
-	stroke: var(--primaryDark) !Important; 
-	stroke-width:2px; 
+.annotation-bkg-cell-default {
+	background: var(--primary90Transparent);
+}
+
+.annotation-bkg-cell-default input{
+	color: transparent;
 }

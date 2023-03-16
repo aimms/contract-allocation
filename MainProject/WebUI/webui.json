@@ -781,9 +781,6 @@
     "aimms.widget.type": {
       "literal": "combinationchart"
     },
-    "color.index": {
-      "literal": "<IDENTIFIER-SET>"
-    },
     "contents.__display_order__": {
       "literal": [
         "contents.0"
