@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<AimmsExcelMapping>
+	<ExcelSheetMapping name="Allocation per Producer">
+		<RowMapping>
+			<ColumnMapping name="Producer" binds-to="i_producerExport" />
+			<ColumnMapping name="Contract" binds-to="i_contractExport" />
+			<ColumnMapping name="Generation" maps-to="p_generation(i_producerExport,i_contractExport)" />
+		</RowMapping>
+	</ExcelSheetMapping>
+	<ExcelSheetMapping name="Contract Allocation">
+		<RowMapping>
+			<ColumnMapping name="Contract" binds-to="i_contractExport" />
+			<ColumnMapping name="Total Generation" maps-to="p_totalGeneration(i_contractExport)" />
+		</RowMapping>
+	</ExcelSheetMapping>
+</AimmsExcelMapping>

@@ -10,7 +10,8 @@
     <SheetMapping name="Contracts">
         <RowMapping name="Contracts">
             <ColumnMapping name="Contracts" binds-to="i_contract"/>
-            <ColumnMapping name="Contract Size" maps-to="p_contractSize(i_contract)"/>
+            <ColumnMapping name="Minimum Contract Size" maps-to="p_minimumContractFulfillment(i_contract)"/>
+            <ColumnMapping name="Maximum Contract Size" maps-to="p_maximumContractFulfillment(i_contract)"/>
             <ColumnMapping name="Minimal Number of Contributors" maps-to="p_minimalNumberofContributors(i_contract)"/>
         </RowMapping>
     </SheetMapping>

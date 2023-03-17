@@ -21,6 +21,9 @@
     "data.manager.hidden": {
       "literal": true
     },
+    "defaults.upload.download.controls.show": {
+      "literal": true
+    },
     "ignoredst": {
       "aimms": {
         "contents": [
@@ -67,12 +70,6 @@
                     "name": "Model Information",
                     "type": "pagev2-grid-sidepanel",
                     "slug": "model_information",
-                    "children": []
-                  },
-                  {
-                    "name": "Informations",
-                    "type": "pagev2-grid-sidepanel",
-                    "slug": "informations",
                     "children": []
                   },
                   {
@@ -241,7 +238,7 @@
       "literal": {
         "componentName": "Grid",
         "props": {
-          "gridTemplateColumns": "2fr 2fr 1fr 1fr",
+          "gridTemplateColumns": "2fr 1fr 1fr 1fr",
           "gridTemplateRows": "1fr 1fr",
           "gridTemplateAreas": "\"area-a area-a area-a area-c\" \"area-d area-d area-b area-b\""
         },
@@ -259,7 +256,7 @@
             "props": {
               "gridArea": "area-b",
               "name": "Area B",
-              "gridAutoFlow": "row"
+              "gridAutoFlow": "column"
             }
           },
           {
@@ -366,34 +363,6 @@
         },
         {
           "uri": "txt_welcome",
-          "layoutInfo": {
-            "width": "2",
-            "height": "1"
-          }
-        }
-      ]
-    }
-  },
-  "pages/informations": {
-    "aimms.widget.type": {
-      "literal": "pagev2-grid-sidepanel"
-    },
-    "bindings": {
-      "literal": [
-        {
-          "widgetUri": "lst_information",
-          "gridArea": "area-a",
-          "dndId": "Unassigned widgetslst_information1"
-        }
-      ]
-    },
-    "layoutId": {
-      "literal": "Layout11"
-    },
-    "widgets": {
-      "literal": [
-        {
-          "uri": "lst_information",
           "layoutInfo": {
             "width": "2",
             "height": "1"
@@ -568,24 +537,29 @@
     "bindings": {
       "literal": [
         {
-          "widgetUri": "tbl_allocation",
-          "gridArea": "area-b",
-          "dndId": "area-dtbl_allocation2"
-        },
-        {
           "widgetUri": "tbl_numContributors",
           "gridArea": "area-c",
-          "dndId": "area-ctbl_numContributors0"
+          "dndId": "area-ctbl_numContributors1"
         },
         {
           "widgetUri": "cbc_generation",
           "gridArea": "area-d",
-          "dndId": "area-dcbc_generation1"
+          "dndId": "area-dcbc_generation2"
         },
         {
           "widgetUri": "cbc_costPerProducer",
           "gridArea": "area-a",
           "dndId": "area-acbc_costPerProducer3"
+        },
+        {
+          "widgetUri": "tbl_allocation",
+          "gridArea": "area-b",
+          "dndId": "area-btbl_allocation0"
+        },
+        {
+          "widgetUri": "tbl_fulfillment",
+          "gridArea": "area-b",
+          "dndId": "Unassigned widgetstbl_fulfillment"
         }
       ]
     },
@@ -665,6 +639,13 @@
         },
         {
           "uri": "tbl_numContributors",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "tbl_fulfillment",
           "layoutInfo": {
             "width": "2",
             "height": "1"
@@ -778,7 +759,7 @@
     },
     "contents.0.identifier": {
       "literal": {
-        "identifier": "p_contractSize",
+        "identifier": "p_minimumContractFulfillment",
         "slice": [
           {
             "index": "i_contract",
@@ -929,7 +910,7 @@
       "literal": "cbc_allocatedCosts"
     },
     "title": {
-      "literal": "Allocated Costs per Contract"
+      "literal": "Contract Allocated Costs"
     }
   },
   "widgets/cbc_generation": {
@@ -941,8 +922,7 @@
     },
     "contents.__display_order__": {
       "literal": [
-        "contents.0",
-        "contents.1"
+        "contents.0"
       ]
     },
     "contents.0.identifier": {
@@ -963,21 +943,6 @@
       }
     },
     "contents.0.numdecimals": {
-      "literal": 0
-    },
-    "contents.1.identifier": {
-      "literal": {
-        "identifier": "p_slackAllocation",
-        "slice": [
-          {
-            "index": "i_contractExport",
-            "type": "subset",
-            "value": "i_contract"
-          }
-        ]
-      }
-    },
-    "contents.1.numdecimals": {
       "literal": 0
     },
     "contents.partition": {
@@ -1176,67 +1141,6 @@
       "literal": 0
     }
   },
-  "widgets/lst_information": {
-    "aimms.widget.type": {
-      "literal": "list"
-    },
-    "list.items.specification": {
-      "aimms": {
-        "contents": [
-          "sp_myListGroupItems"
-        ],
-        "slices": [
-          {
-            "identifier": "sp_myListGroupItems",
-            "slice": [
-              {
-                "index": "webui::indexListGroupOrder",
-                "type": "free",
-                "value": "webui::indexListGroupOrder"
-              },
-              {
-                "index": "webui::indexNoOfListItems",
-                "type": "free",
-                "value": "webui::indexNoOfListItems"
-              },
-              {
-                "index": "webui::indexListGroupItemsSpec",
-                "type": "free",
-                "value": "webui::indexListGroupItemsSpec"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "list.specification": {
-      "aimms": {
-        "contents": [
-          "sp_myListsGroups"
-        ],
-        "slices": [
-          {
-            "identifier": "sp_myListsGroups",
-            "slice": [
-              {
-                "index": "webui::indexListGroupOrder",
-                "type": "free",
-                "value": "webui::indexListGroupOrder"
-              },
-              {
-                "index": "webui::indexListGroupSpec",
-                "type": "free",
-                "value": "webui::indexListGroupSpec"
-              }
-            ]
-          }
-        ]
-      }
-    },
-    "name": {
-      "literal": "lst_information"
-    }
-  },
   "widgets/scl_modelInformation": {
     "aimms.widget.type": {
       "literal": "scalar"
@@ -1286,6 +1190,9 @@
         ]
       }
     },
+    "contents.numdecimals": {
+      "literal": 0
+    },
     "contents.partition": {
       "literal": {
         "rowHeader": [
@@ -1316,6 +1223,27 @@
             "i_contract": "sum_only_visible"
           },
           "width": 17.98
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_minimalDelivery"
+          },
+          "width": 13.2
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_totalDelivery"
+          },
+          "width": 13.04
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_availableCapacity"
+          },
+          "width": 13.44
         }
       ]
     },
@@ -1324,6 +1252,9 @@
     },
     "name": {
       "literal": "tbl_allocation"
+    },
+    "title": {
+      "literal": "Total Delivered"
     }
   },
   "widgets/tbl_contractsInformation": {
@@ -1334,8 +1265,16 @@
       "aimms": {
         "contents": [
           "p_minimalNumberofContributors",
-          "p_contractSize"
+          "p_minimumContractFulfillment",
+          "p_maximumContractFulfillment"
         ]
+      }
+    },
+    "contents.displaydomain": {
+      "literal": {
+        "p_maximumcontractfulfillment": "1",
+        "p_minimalnumberofcontributors": "1",
+        "p_minimumcontractfulfillment": "1"
       }
     },
     "contents.partition": {
@@ -1376,6 +1315,25 @@
             "<IDENTIFIER-SET>": "p_contractSize"
           },
           "width": 18.01
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_minimumContractFulfillment"
+          },
+          "width": 19.16
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_maximumContractFulfillment"
+          },
+          "width": 17.08
+        },
+        {
+          "type": "rowHeader",
+          "colKey": "i_contract",
+          "width": 15
         }
       ]
     },
@@ -1394,6 +1352,65 @@
       "literal": "Contract Information"
     }
   },
+  "widgets/tbl_fulfillment": {
+    "aimms.widget.type": {
+      "literal": "table"
+    },
+    "contents": {
+      "aimms": {
+        "contents": [
+          "p_def_minimumContractFulfillment",
+          "p_def_actualContractFulfillment",
+          "p_def_maximumContractFulfillment"
+        ]
+      }
+    },
+    "contents.numdecimals": {
+      "literal": 0
+    },
+    "contents.partition": {
+      "literal": {
+        "rowHeader": [
+          "i_contract"
+        ],
+        "colHeader": [
+          "<IDENTIFIER-SET>"
+        ],
+        "aggregated": []
+      }
+    },
+    "custom.column.widths": {
+      "literal": [
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_maximumContractFulfillment"
+          },
+          "width": 13.33
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_minimumContractFulfillment"
+          },
+          "width": 13.12
+        },
+        {
+          "type": "colHeader",
+          "colKey": {
+            "<IDENTIFIER-SET>": "p_def_actualContractFulfillment"
+          },
+          "width": 13.12
+        }
+      ]
+    },
+    "name": {
+      "literal": "tbl_fulfillment"
+    },
+    "title": {
+      "literal": "Contract Fulfillment"
+    }
+  },
   "widgets/tbl_numContributors": {
     "aimms.widget.type": {
       "literal": "table"
@@ -1405,6 +1422,9 @@
           "p_def_actualnumberOfContributors"
         ]
       }
+    },
+    "contents.numdecimals": {
+      "literal": 0
     },
     "contents.partition": {
       "literal": {

@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<AimmsXMLMapping>
+	<ElementObjectMapping name="Allocation per Producer">
+		<ElementObjectMapping name="Row">
+			<AttributeMapping name="Producer" binds-to="i_producerExport" />
+			<AttributeMapping name="Contract" binds-to="i_contractExport" />
+			<ElementValueMapping name="Generation" maps-to="p_generation(i_producerExport,i_contractExport)" />
+		</ElementObjectMapping>
+	</ElementObjectMapping>
+</AimmsXMLMapping>

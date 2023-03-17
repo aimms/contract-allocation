@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<AimmsJSONMapping>
+	<ObjectMapping>
+		<ColumnMapping name="columns">
+			<RowMapping name="Producer" binds-to="i_producerExport" />
+			<RowMapping name="Contract" binds-to="i_contractExport" />
+			<RowMapping name="Generation" maps-to="p_generation(i_producerExport,i_contractExport)" />
+		</ColumnMapping>
+	</ObjectMapping>
+</AimmsJSONMapping>

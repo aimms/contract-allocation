@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<AimmsJSONMapping>
+	<ObjectMapping>
+		<ArrayMapping name="rows">
+			<ObjectMapping dense-children="1">
+				<ValueMapping name="Contract" binds-to="i_contractExport" />
+				<ValueMapping name="Total Generation" maps-to="p_totalGeneration(i_contractExport)" />
+			</ObjectMapping>
+		</ArrayMapping>
+	</ObjectMapping>
+</AimmsJSONMapping>

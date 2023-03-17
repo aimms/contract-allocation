@@ -55,14 +55,16 @@ Model Main_ContractAllocation {
 					Text: "Available capacity for producer p";
 					Range: nonnegative;
 					Unit: kg;
-					webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
+					InitialData: 0;
+					webui::AnnotationsIdentifier: p_availableCapacityAnnotation;
 				}
 				Parameter p_minimalDelivery {
 					IndexDomain: (i_producer);
 					Text: "Minimal delivery size for producer p";
 					Range: nonnegative;
 					Unit: kg;
-					webui::AnnotationsIdentifier: sp_producersIndexedAnnotation;
+					InitialData: 0;
+					webui::AnnotationsIdentifier: p_minimalDeliveryAnnotation;
 				}
 			}
 			Section Contracts {
@@ -71,13 +73,22 @@ Model Main_ContractAllocation {
 					Index: i_contract, i_contract1;
 					Parameter: ep_contract;
 				}
-				Parameter p_contractSize {
+				Parameter p_minimumContractFulfillment {
 					IndexDomain: (i_contract);
-					Text: "Size of contract c";
+					Text: "Min of contract c";
 					Range: nonnegative;
 					Unit: kg;
 					InitialData: 0;
-					webui::AnnotationsIdentifier: sp_contractSizeAnnotation;
+					webui::AnnotationsIdentifier: sp_minimumContractFulfillmentAnnotation;
+				}
+				Parameter p_maximumContractFulfillment {
+					IndexDomain: (i_contract);
+					Text: "Max of contract c";
+					Range: nonnegative;
+					Unit: kg;
+					Default: inf;
+					InitialData: inf;
+					webui::AnnotationsIdentifier: sp_maximumContractFulfillmentAnnotation;
 				}
 				Parameter p_minimalNumberofContributors {
 					IndexDomain: (i_contract);
@@ -93,7 +104,7 @@ Model Main_ContractAllocation {
 					Text: "Unit cost for delivery by producer p for contract c";
 					Unit: $/kg;
 					InitialData: 0;
-					webui::AnnotationsIdentifier: sp_contractsProducersIndexedAnnotation;
+					webui::AnnotationsIdentifier: sp_productionCostAnnotation;
 				}
 			}
 		}
@@ -119,16 +130,30 @@ Model Main_ContractAllocation {
 				IndexDomain: (i_producer);
 				Text: "Production capacity for producer p";
 				Unit: kg;
-				Definition: sum(i_contract, v_generation(i_producer,i_contract)) <= p_availableCapacity(i_producer);
+				Definition: {
+					sum(i_contract, v_generation(i_producer,i_contract)) 
+					<= 
+					p_availableCapacity(i_producer)
+				}
 			}
-			Constraint c_contractFullfillment {
+			Constraint c_minimumContractFullfillment {
 				IndexDomain: (i_contract);
 				Text: "The demand for contract c is met";
 				Unit: kg;
 				Definition: {
 					sum(i_producer, v_generation(i_producer,i_contract)) 
 					>= 
-					p_contractSize(i_contract)
+					p_minimumContractFulfillment(i_contract)
+				}
+			}
+			Constraint c_maximumContractFullfillment {
+				IndexDomain: (i_contract);
+				Text: "The demand for contract c is met";
+				Unit: kg;
+				Definition: {
+					sum(i_producer, v_generation(i_producer,i_contract)) 
+					<= 
+					p_maximumContractFulfillment(i_contract)
 				}
 			}
 			Constraint c_contractContribution {
@@ -262,25 +287,6 @@ Model Main_ContractAllocation {
 				dex::Dataset: Export;
 				dex::TableName: Contract Allocation;
 			}
-			Parameter p_slackAllocation {
-				IndexDomain: i_contractExport;
-				Unit: kg;
-				Definition: {
-					p_contractSize(i_contractExport) 
-					- sum(i_producerExport, v_generation(i_producerExport, i_contractExport))
-				}
-				dex::ColumnName: Slack;
-				dex::Dataset: Export;
-				dex::TableName: Contract Allocation;
-				webui::AnnotationsIdentifier: sp_slackAllocationAnnotation(i_contractExport);
-			}
-			StringParameter sp_slackAllocationAnnotation {
-				IndexDomain: i_contractExport | p_slackAllocation(i_contractExport);
-				Definition: "has some slack";
-				dex::ColumnName: Slack comment;
-				dex::Dataset: Export;
-				dex::TableName: Contract Allocation;
-			}
 			Parameter p_disaggregatedCost {
 				IndexDomain: (i_producer,i_contract);
 				Unit: $;
@@ -311,6 +317,27 @@ Model Main_ContractAllocation {
 					IndexDomain: i_producer;
 					Unit: kg;
 					Definition: p_minimalDelivery(i_producer);
+				}
+				Parameter p_def_minimumContractFulfillment {
+					IndexDomain: (i_contract);
+					Text: "Min of contract c";
+					Range: nonnegative;
+					Unit: kg;
+					Definition: p_minimumContractFulfillment(i_contract);
+				}
+				Parameter p_def_maximumContractFulfillment {
+					IndexDomain: (i_contract);
+					Text: "Max of contract c";
+					Range: nonnegative;
+					Unit: kg;
+					Default: inf;
+					Definition: p_maximumContractFulfillment(i_contract);
+				}
+				Parameter p_def_actualContractFulfillment {
+					IndexDomain: (i_contract);
+					Range: nonnegative;
+					Unit: kg;
+					Definition: sum(i_producer, v_generation(i_producer,i_contract));
 				}
 			}
 		}
@@ -358,14 +385,6 @@ Model Main_ContractAllocation {
 		Section Pages {
 			Section Input_Page {
 				DeclarationSection Input_Annotations {
-					StringParameter sp_producersIndexedAnnotation {
-						IndexDomain: i_producer;
-						Definition: {
-							if i_producer = ep_actualProducer then
-								"bkg-cell"
-							endif
-						}
-					}
 					StringParameter sp_minimalNumberofContributorsAnnotation {
 						IndexDomain: i_contract;
 						Definition: {
@@ -389,25 +408,73 @@ Model Main_ContractAllocation {
 							    and p_contractSize(ep_actualContract) <> 0[kg])"
 						}
 					}
-					StringParameter sp_contractSizeAnnotation {
+					StringParameter sp_minimumContractFulfillmentAnnotation {
 						IndexDomain: i_contract;
 						Definition: {
 							if (i_contract = ep_actualContract
-							    and p_contractSize(ep_actualContract) = 0[kg]) then
+							    and p_minimumContractFulfillment(ep_actualContract) = 0[kg]) then
 								"bkg-cell-default"
 							
 							elseif (i_contract = ep_actualContract
-							    and p_contractSize(ep_actualContract) <> 0[kg]) then
+							    and p_minimumContractFulfillment(ep_actualContract) <> 0[kg]) then
 								"bkg-cell"
 							
 							endif
 						}
 					}
-					StringParameter sp_contractsProducersIndexedAnnotation {
-						IndexDomain: (i_producer,i_contract);
+					StringParameter sp_maximumContractFulfillmentAnnotation {
+						IndexDomain: i_contract;
 						Definition: {
-							if i_contract = ep_actualContract and i_producer = ep_actualProducer then
+							if (i_contract = ep_actualContract
+							    and p_maximumContractFulfillment(ep_actualContract) = 0[kg]) then
+								"bkg-cell-default"
+							
+							elseif (i_contract = ep_actualContract
+							    and p_maximumContractFulfillment(ep_actualContract) <> 0[kg]) then
 								"bkg-cell"
+							
+							endif
+						}
+					}
+					StringParameter p_minimalDeliveryAnnotation {
+						IndexDomain: i_producer;
+						Definition: {
+							if (i_producer = ep_actualProducer
+							    and p_minimalDelivery(ep_actualProducer) = 0[kg]) then
+								"bkg-cell-default"
+							
+							elseif (i_producer = ep_actualProducer
+							    and p_minimalDelivery(ep_actualProducer) <> 0[kg]) then
+								"bkg-cell"
+							
+							endif
+						}
+					}
+					StringParameter p_availableCapacityAnnotation {
+						IndexDomain: i_producer;
+						Definition: {
+							if (i_producer = ep_actualProducer
+							    and p_availableCapacity(ep_actualProducer) = 0[kg]) then
+								"bkg-cell-default"
+							
+							elseif (i_producer = ep_actualProducer
+							    and p_availableCapacity(ep_actualProducer) <> 0[kg]) then
+								"bkg-cell"
+							
+							endif
+						}
+					}
+					StringParameter sp_productionCostAnnotation {
+						IndexDomain: (i_producer, i_contract);
+						Definition: {
+							if (i_contract = ep_actualContract and i_producer = ep_actualProducer
+							    and p_productionCost(ep_actualProducer, ep_actualContract) = 0[$/kg]) then
+								"bkg-cell-default"
+							
+							elseif (i_contract = ep_actualContract and i_producer = ep_actualProducer
+							    and p_productionCost(ep_actualProducer, ep_actualContract) <> 0[$/kg]) then
+								"bkg-cell"
+							
 							endif
 						}
 					}
@@ -490,10 +557,8 @@ Model Main_ContractAllocation {
 						IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
 						Definition: {
 							data 
-							{ ( 1, displayText ) : "KPIs"             ,  ( 1, pageId      ) : "informations"     ,
-							  ( 1, icon        ) : "aimms-question"   ,  ( 1, state       ) : "active"           ,
-							  ( 2, displayText ) : "Model Information",  ( 2, pageId      ) : "model_information",
-							  ( 2, icon        ) : "aimms-info"       ,  ( 2, state       ) : "active"            }
+							{ ( 1, displayText ) : "Model Information",  ( 1, pageId      ) : "model_information",
+							  ( 1, icon        ) : "aimms-info"       ,  ( 1, state       ) : "active"            }
 						}
 					}
 				}

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<AimmsXMLMapping>
+	<ElementObjectMapping name="Contract Allocation">
+		<ElementObjectMapping name="Row" dense-children="1">
+			<AttributeMapping name="Contract" binds-to="i_contractExport" />
+			<AttributeMapping name="Total Generation" maps-to="p_totalGeneration(i_contractExport)" />
+		</ElementObjectMapping>
+	</ElementObjectMapping>
+</AimmsXMLMapping>
