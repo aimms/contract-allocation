@@ -25,6 +25,11 @@ Model Main_ContractAllocation {
 			Quantity q_monetary {
 				BaseUnit: $;
 			}
+			Quantity SI_Unitless {
+				BaseUnit: -;
+				Conversions: % -> - : # -> # / 100;
+				Comment: "Expresses a dimensionless value.";
+			}
 		}
 		Section Inputs {
 			Procedure pr_importExcelData {
@@ -368,7 +373,7 @@ Model Main_ContractAllocation {
 					{ ( 1, 1, displayText       ) : "Welcome"            ,  ( 1, 1, icon              ) : "aimms-happy"        ,
 					  ( 1, 1, pageId            ) : "home"               ,  ( 1, 1, tooltip           ) : "welcome"            ,
 					  ( 1, 1, workflowPageState ) : "active"             ,  ( 1, 1, pageDataState     ) : "Incomplete"         ,
-					  ( 1, 1, redirectPageId    ) : "home"               ,  ( 1, 2, displayText       ) : "Story"              ,
+					  ( 1, 1, redirectPageId    ) : "problem_description",  ( 1, 2, displayText       ) : "Story"              ,
 					  ( 1, 2, icon              ) : "aimms-lamp5"        ,  ( 1, 2, pageId            ) : "problem_description",
 					  ( 1, 2, tooltip           ) : "Problem description",  ( 1, 2, workflowPageState ) : "active"             ,
 					  ( 1, 2, pageDataState     ) : "incomplete"         ,  ( 1, 2, redirectPageId    ) : "home"               ,
