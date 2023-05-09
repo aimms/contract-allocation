@@ -226,17 +226,17 @@ Model Main_ContractAllocation {
 			Procedure pr_exportExcelData {
 				Arguments: (FileLocation,statusCode,statusDescription);
 				Body: {
-					! writing the output file locally
-					dex::WriteToFile(
-					    dataFile    :  sp_FileName, 
-						mappingName :  ep_selectedMapping, 
-						pretty      :  1);
-					
 					! we want to download a file
 					FileLocation := sp_FileName;
 					
 					! we store the location of the file in string parameter FinalLocation
 					FinalLocation := webui::GetIOFilePath(FileLocation);
+					
+					! writing the output file locally
+					dex::WriteToFile(
+					    dataFile    :  FinalLocation, 
+						mappingName :  ep_selectedMapping, 
+						pretty      :  1);
 					
 					! checking if the previous write statement was successful or not
 					if FileExists(FinalLocation) then
