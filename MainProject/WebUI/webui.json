@@ -159,45 +159,12 @@
       }
     }
   },
-  "layouts/custom_00dc0a72-01d7-43df-b5f2-ca14bbc2b158": {
-    "definition": {
-      "literal": {
-        "componentName": "Grid",
-        "props": {
-          "gridTemplateColumns": "1fr",
-          "gridTemplateRows": "60% 60%",
-          "gridTemplateAreas": "\"area-a\" \"area-b\""
-        },
-        "items": [
-          {
-            "componentName": "WidgetArea",
-            "props": {
-              "gridArea": "area-a",
-              "name": "Area A",
-              "gridAutoFlow": "column"
-            }
-          },
-          {
-            "componentName": "WidgetArea",
-            "props": {
-              "gridArea": "area-b",
-              "name": "Area B",
-              "gridAutoFlow": "column"
-            }
-          }
-        ]
-      }
-    },
-    "displayName": {
-      "literal": "Layout1 Copy"
-    }
-  },
   "layouts/custom_234161e0-a7c2-477f-b278-101c9e62d5e4": {
     "definition": {
       "literal": {
         "componentName": "Grid",
         "props": {
-          "gridTemplateColumns": "0.5fr 0.3fr 0.3fr",
+          "gridTemplateColumns": "0.3fr 0.3fr 0.5fr",
           "gridTemplateRows": "1fr",
           "gridTemplateAreas": "\"area-a area-b area-c\""
         },
@@ -279,7 +246,7 @@
       }
     },
     "displayName": {
-      "literal": "Layout8 Copy"
+      "literal": "LayoutResults"
     }
   },
   "pages/export_page": {
@@ -378,34 +345,34 @@
     "bindings": {
       "literal": [
         {
-          "widgetUri": "tbl_contractsInformation",
+          "widgetUri": "tbl_productionCost_1",
           "gridArea": "area-c",
-          "dndId": "area-ctbl_contractsInformation1"
+          "dndId": "area-ctbl_productionCost_11"
         },
         {
-          "widgetUri": "cbc_contractsInformation",
+          "widgetUri": "bbc_productionCost_1",
           "gridArea": "area-c",
-          "dndId": "area-ccbc_contractsInformation2"
+          "dndId": "area-cbbc_productionCost_12"
         },
         {
           "widgetUri": "tbl_producersInformation",
           "gridArea": "area-b",
-          "dndId": "area-ctbl_producersInformation0"
+          "dndId": "area-btbl_producersInformation3"
         },
         {
           "widgetUri": "lnd_producersInformation_1",
           "gridArea": "area-b",
-          "dndId": "area-blnd_producersInformation_13"
+          "dndId": "area-blnd_producersInformation_14"
         },
         {
-          "widgetUri": "tbl_productionCost_1",
+          "widgetUri": "tbl_contractsInformation",
           "gridArea": "area-a",
-          "dndId": "area-atbl_productionCost_14"
+          "dndId": "area-ctbl_contractsInformation0"
         },
         {
-          "widgetUri": "bbc_productionCost_1",
+          "widgetUri": "cbc_contractsInformation",
           "gridArea": "area-a",
-          "dndId": "area-abbc_productionCost_15"
+          "dndId": "area-acbc_contractsInformation5"
         }
       ]
     },

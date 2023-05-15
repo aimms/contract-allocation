@@ -32,23 +32,6 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Inputs {
-			Procedure pr_importExcelData {
-				Body: {
-					dex::AddMapping(
-						mappingName :  "inputs", 
-						mappingFile :  "Mappings/inputs.xml");
-					
-					dex::ReadFromFile(
-						dataFile         :  "NothWesternStates.xlsx", 
-						mappingName      :  "inputs", 
-						emptyIdentifiers :  1, 
-						emptySets        :  1, 
-						resetCounters    :  1);
-					
-					ep_actualContract := first(i_contract);
-					ep_actualProducer := first(i_producer);
-				}
-			}
 			Section Producers {
 				Set s_producers {
 					Text: "The set of all producers";
@@ -223,127 +206,49 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Outputs {
-			Procedure pr_exportExcelData {
-				Arguments: (FileLocation,statusCode,statusDescription);
-				Body: {
-					! we want to download a file
-					FileLocation := sp_FileName;
-					
-					! we store the location of the file in string parameter FinalLocation
-					FinalLocation := webui::GetIOFilePath(FileLocation);
-					
-					! writing the output file locally
-					dex::WriteToFile(
-					    dataFile    :  FinalLocation, 
-						mappingName :  ep_selectedMapping, 
-						pretty      :  1);
-					
-					! checking if the previous write statement was successful or not
-					if FileExists(FinalLocation) then
-					
-					   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
-					   StatusCode := webui::ReturnStatusCode('CREATED');
-					   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
-					   StatusDescription := "Ready to download exported data!";
-					
-					else    !if previous write statement was not successful
-					
-					   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
-					   statusCode := webui::ReturnStatusCode('ERROR');
-					   !displaying a custom error message
-					   statusDescription := "Something went wrong when creating the file.";
-					
-					endif;
-				}
-				StringParameter FileLocation {
-					Property: Output;
-				}
-				StringParameter FinalLocation;
-				Parameter statusCode {
-					Property: Output;
-				}
-				StringParameter statusDescription {
-					Property: Output;
-				}
+			Parameter p_def_actualnumberOfContributors {
+				IndexDomain: i_contract;
+				Definition: sum(i_producer | v_generation(i_producer, i_contract), 1);
 			}
-			Index i_contractExport {
-				Range: s_contracts;
-				Comment: "Used to define column name in export process";
-				dex::ColumnName: Contract;
+			Parameter p_def_minNumberOfContributors {
+				IndexDomain: i_contract;
+				Definition: p_minimalNumberofContributors(i_contract);
 			}
-			Index i_producerExport {
-				Range: s_producers;
-				Comment: "Used to define column name in export process";
-				dex::ColumnName: Producer;
-			}
-			Parameter p_generation {
-				IndexDomain: (i_producerExport, i_contractExport);
+			Parameter p_def_totalDelivery {
+				IndexDomain: i_producer;
 				Unit: kg;
-				Definition: v_generation(i_producerExport, i_contractExport);
-				dex::ColumnName: Generation;
-				dex::Dataset: Export;
-				dex::TableName: Allocation per Producer;
+				Definition: sum(i_contract, v_generation(i_producer,i_contract));
 			}
-			Parameter p_totalGeneration {
-				IndexDomain: i_contractExport;
+			Parameter p_def_availableCapacity {
+				IndexDomain: i_producer;
 				Unit: kg;
-				Definition: sum(i_producerExport, p_generation(i_producerExport, i_contractExport));
-				dex::ColumnName: Total Generation;
-				dex::Dataset: Export;
-				dex::TableName: Contract Allocation;
+				Definition: p_availableCapacity(i_producer);
 			}
-			Parameter p_disaggregatedCost {
-				IndexDomain: (i_producer,i_contract);
-				Unit: $;
-				Definition: p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract);
+			Parameter p_def_minimalDelivery {
+				IndexDomain: i_producer;
+				Unit: kg;
+				Definition: p_minimalDelivery(i_producer);
 			}
-			Section by_Cost {
-				Parameter p_def_actualnumberOfContributors {
-					IndexDomain: i_contract;
-					Definition: sum(i_producer | v_generation(i_producer, i_contract), 1);
-				}
-				Parameter p_def_minNumberOfContributors {
-					IndexDomain: i_contract;
-					Definition: p_minimalNumberofContributors(i_contract);
-				}
+			Parameter p_def_minimumContractFulfillment {
+				IndexDomain: (i_contract);
+				Text: "Min of contract c";
+				Range: nonnegative;
+				Unit: kg;
+				Definition: p_minimumContractFulfillment(i_contract);
 			}
-			Section by_Size {
-				Parameter p_def_totalDelivery {
-					IndexDomain: i_producer;
-					Unit: kg;
-					Definition: sum(i_contract, v_generation(i_producer,i_contract));
-				}
-				Parameter p_def_availableCapacity {
-					IndexDomain: i_producer;
-					Unit: kg;
-					Definition: p_availableCapacity(i_producer);
-				}
-				Parameter p_def_minimalDelivery {
-					IndexDomain: i_producer;
-					Unit: kg;
-					Definition: p_minimalDelivery(i_producer);
-				}
-				Parameter p_def_minimumContractFulfillment {
-					IndexDomain: (i_contract);
-					Text: "Min of contract c";
-					Range: nonnegative;
-					Unit: kg;
-					Definition: p_minimumContractFulfillment(i_contract);
-				}
-				Parameter p_def_maximumContractFulfillment {
-					IndexDomain: (i_contract);
-					Text: "Max of contract c";
-					Range: nonnegative;
-					Unit: kg;
-					Default: inf;
-					Definition: p_maximumContractFulfillment(i_contract);
-				}
-				Parameter p_def_actualContractFulfillment {
-					IndexDomain: (i_contract);
-					Range: nonnegative;
-					Unit: kg;
-					Definition: sum(i_producer, v_generation(i_producer,i_contract));
-				}
+			Parameter p_def_maximumContractFulfillment {
+				IndexDomain: (i_contract);
+				Text: "Max of contract c";
+				Range: nonnegative;
+				Unit: kg;
+				Default: inf;
+				Definition: p_maximumContractFulfillment(i_contract);
+			}
+			Parameter p_def_actualContractFulfillment {
+				IndexDomain: (i_contract);
+				Range: nonnegative;
+				Unit: kg;
+				Definition: sum(i_producer, v_generation(i_producer,i_contract));
 			}
 		}
 	}
@@ -496,8 +401,47 @@ Model Main_ContractAllocation {
 						}
 					}
 				}
+				Section Import {
+					Procedure pr_importExcelData {
+						Body: {
+							dex::AddMapping(
+								mappingName :  "inputs", 
+								mappingFile :  "Mappings/inputs.xml");
+							
+							dex::ReadFromFile(
+								dataFile         :  "NothWesternStates.xlsx", 
+								mappingName      :  "inputs", 
+								emptyIdentifiers :  1, 
+								emptySets        :  1, 
+								resetCounters    :  1);
+							
+							ep_actualContract := first(i_contract);
+							ep_actualProducer := first(i_producer);
+						}
+					}
+				}
 			}
 			Section Results_Page {
+				DeclarationSection Result_Side_Panel {
+					StringParameter sp_resultsSidePanel {
+						IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
+						Definition: {
+							data 
+							{ ( 1, displayText ) : "Model Information",  ( 1, pageId      ) : "model_information",
+							  ( 1, icon        ) : "aimms-info"       ,  ( 1, state       ) : "active"            }
+						}
+					}
+				}
+				DeclarationSection Results_PageAction {
+					StringParameter sp_resultsSecondaryActions {
+						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
+						Definition: {
+							data 
+							{ ( 1, displaytext ) : "Export"            ,  ( 1, icon        ) : "aimms-file-download"  ,
+							  ( 1, procedure   ) : "pr_openExportPage",  ( 1, state       ) : "active"            }
+						}
+					}
+				}
 				Procedure pr_openExportPage {
 					Body: {
 						!Generating all possible mappings
@@ -530,100 +474,100 @@ Model Main_ContractAllocation {
 						Range: webui::AllDialogPages;
 					}
 				}
-				StringParameter sp_messageString {
-					Text: "A message describing the production of a certain producer for a certain contract";
-					Definition: {
-						FormatString("Total delivery by producer %e for contract %e is %n",
-						ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract))
+				Section Export {
+					Procedure pr_exportExcelData {
+						Arguments: (sp_out_fileLocation,p_out_statusCode,sp_out_statusDescription);
+						Body: {
+							! we want to download a file
+							sp_out_fileLocation := sp_FileName;
+							
+							! we store the location of the file in string parameter FinalLocation
+							sp_loc_FinalLocation := webui::GetIOFilePath(sp_out_fileLocation);
+							
+							! writing the output file locally
+							dex::WriteToFile(
+							    dataFile    :  sp_loc_FinalLocation, 
+								mappingName :  ep_selectedMapping, 
+								pretty      :  1);
+							
+							! checking if the previous write statement was successful or not
+							if FileExists(sp_loc_FinalLocation) then
+							
+							   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
+							   p_out_statusCode := webui::ReturnStatusCode('CREATED');
+							   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
+							   sp_out_statusDescription := "Ready to download exported data!";
+							
+							else    !if previous write statement was not successful
+							
+							   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
+							   p_out_statusCode := webui::ReturnStatusCode('ERROR');
+							   !displaying a custom error message
+							   sp_out_statusDescription := "Something went wrong when creating the file.";
+							
+							endif;
+						}
+						StringParameter sp_out_fileLocation {
+							Property: Output;
+						}
+						Parameter p_out_statusCode {
+							Property: Output;
+						}
+						StringParameter sp_out_statusDescription {
+							Property: Output;
+						}
+						StringParameter sp_loc_finalLocation;
 					}
-				}
-				ElementParameter ep_generationColor {
-					IndexDomain: (i_producer,i_contract);
-					Text: "Display message in color, based on the amount of generation in relation to the bounds";
-					Range: AllColors;
-					Definition: {
-						if sum(i_contract1, v_generation(i_producer,i_contract1)) = p_availableCapacity(i_producer) 
-						    and v_generation(i_producer,i_contract) = p_minimalDelivery(i_producer) then
-							'red'
-						
-						elseif  sum(i_contract1, v_generation(i_producer,i_contract1)) = p_availableCapacity(i_producer) then
-							'magenta'
-						
-						elseif  v_generation(i_producer,i_contract) = p_minimalDelivery(i_producer) then
-							'blue'
-						
-						else
-							'black'
-						endif;
-					}
-				}
-				DeclarationSection Result_Side_Panel {
-					StringParameter sp_resultsSidePanel {
-						IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
-						Definition: {
-							data 
-							{ ( 1, displayText ) : "Model Information",  ( 1, pageId      ) : "model_information",
-							  ( 1, icon        ) : "aimms-info"       ,  ( 1, state       ) : "active"            }
+					DeclarationSection Export_Identifiers {
+						Index i_contractExport {
+							Range: s_contracts;
+							Comment: "Used to define column name in export process";
+							dex::ColumnName: Contract;
+						}
+						Index i_producerExport {
+							Range: s_producers;
+							Comment: "Used to define column name in export process";
+							dex::ColumnName: Producer;
+						}
+						Parameter p_generation {
+							IndexDomain: (i_producerExport, i_contractExport);
+							Unit: kg;
+							Definition: v_generation(i_producerExport, i_contractExport);
+							dex::ColumnName: Generation;
+							dex::Dataset: Export;
+							dex::TableName: Allocation per Producer;
+						}
+						Parameter p_totalGeneration {
+							IndexDomain: i_contractExport;
+							Unit: kg;
+							Definition: sum(i_producerExport, p_generation(i_producerExport, i_contractExport));
+							dex::ColumnName: Total Generation;
+							dex::Dataset: Export;
+							dex::TableName: Contract Allocation;
+						}
+						Parameter p_disaggregatedCost {
+							IndexDomain: (i_producer,i_contract);
+							Unit: $;
+							Definition: p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract);
 						}
 					}
-				}
-				DeclarationSection Result_Lists {
-					StringParameter sp_myListsGroups {
-						IndexDomain: (webui::indexListGroupOrder,webui::indexListGroupSpec);
-						Definition: data { ( 1, title ) : "KPI",  ( 2, title ) : "Legend" };
-					}
-					StringParameter sp_myListGroupItems {
-						IndexDomain: (webui::indexListGroupOrder,webui::indexNoOfListItems,webui::indexListGroupItemsSpec);
-						Definition: {
-							{( '1', '1', 'icon'  ) : "aimms-circle2",  
-							( '1', '1', 'color' ) : FormatString("%e", ep_generationColor(ep_actualProducer,ep_actualContract)),  
-							( '1', '1', 'text'  ) : FormatString("Total delivery by producer %e for contract %e is %n.", ep_actualProducer, ep_actualContract, v_generation(ep_actualProducer, ep_actualContract)),
-							( '1', '1', 'state' ) : "active"        ,
-							( '2', '1', 'icon'  ) : "aimms-circle2",
-							( '2', '1', 'color' ) : "red",
-							( '2', '1', 'text'  ) : "Red indicates that all capacity is used and the amount of delivery is minimal.",
-							( '2', '1', 'state' ) : "active",
-							( '2', '2', 'icon'  ) : "aimms-circle2",
-							( '2', '2', 'color' ) : "magenta",
-							( '2', '2', 'text'  ) : "Magenta indicates that all capacity is used. ",
-							( '2', '2', 'state' ) : "active",
-							( '2', '3', 'icon'  ) : "aimms-circle2",
-							( '2', '3', 'color' ) : "blue",
-							( '2', '3', 'text'  ) : "Blue indicates that the amount of delivery is minimal. Black in all remaining situations.",
-							(' 2', '3', 'state' ) : "active" ,
-							( '2', '4', 'icon'  ) : "aimms-circle2",
-							( '2', '4', 'color' ) : "black",
-							( '2', '4', 'text'  ) : "Otherwise.",
-							(' 2', '4', 'state' ) : "active" }
+					DeclarationSection Export_Dialog {
+						StringParameter sp_fileName {
+							Default: "Your File Name Here.xlsx";
+							Comment: "file name of exported data";
 						}
-					}
-				}
-				DeclarationSection Export_Dialog {
-					StringParameter sp_fileName {
-						Default: "Your File Name Here.xlsx";
-						Comment: "file name of exported data";
-					}
-					ElementParameter ep_selectedMapping {
-						Range: s_generatedMappings;
-						Default: '';
-						Comment: "selected generated mapping for export";
-					}
-					Set s_generatedMappings {
-						SubsetOf: dex::Mappings;
-						Index: i_generatedMappings;
-						Definition: {
-							{dex::map | FindString(dex::map, "Generated/",CaseSensitive :  1, WordOnly      :  0)}
+						ElementParameter ep_selectedMapping {
+							Range: s_generatedMappings;
+							Default: '';
+							Comment: "selected generated mapping for export";
 						}
-						Comment: "all generated selected mappings";
-					}
-				}
-				DeclarationSection Results_PageAction {
-					StringParameter sp_resultsSecondaryActions {
-						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
-						Definition: {
-							data 
-							{ ( 1, displaytext ) : "Export"            ,  ( 1, icon        ) : "aimms-file-download"  ,
-							  ( 1, procedure   ) : "pr_openExportPage",  ( 1, state       ) : "active"            }
+						Set s_generatedMappings {
+							SubsetOf: dex::Mappings;
+							Index: i_generatedMappings;
+							Definition: {
+								{dex::map | FindString(dex::map, "Generated/",CaseSensitive :  1, WordOnly      :  0)}
+							}
+							Comment: "all generated selected mappings";
 						}
 					}
 				}
