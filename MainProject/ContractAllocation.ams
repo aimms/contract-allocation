@@ -308,15 +308,6 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
-						Comment: {
-							"or  
-							    (i_contract = ep_actualContract
-							    and p_contractSize(ep_actualContract) = 0[kg]) 
-							
-							    or  
-							    (i_contract = ep_actualContract
-							    and p_contractSize(ep_actualContract) <> 0[kg])"
-						}
 					}
 					StringParameter sp_minimumContractFulfillmentAnnotation {
 						IndexDomain: i_contract;
