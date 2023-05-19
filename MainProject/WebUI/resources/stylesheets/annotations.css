@@ -9,3 +9,15 @@
 .annotation-bkg-cell-default input{
 	color: transparent;
 }
+
+.annotation-reach-maximum {
+	background: rgba(255, 0, 0, 0.438);
+}
+
+.annotation-reach-minimum {
+	background: rgba(255, 255, 0, 0.438);
+}
+
+.annotation-between {
+	background: rgba(0, 128, 0, 0.438);
+}

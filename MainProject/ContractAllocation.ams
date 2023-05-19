@@ -249,6 +249,19 @@ Model Main_ContractAllocation {
 				Range: nonnegative;
 				Unit: kg;
 				Definition: sum(i_producer, v_generation(i_producer,i_contract));
+				webui::AnnotationsIdentifier: sp_def_bgColorActualContractFulfillment;
+			}
+			StringParameter sp_def_bgColorActualContractFulfillment {
+				IndexDomain: (i_contract);
+				Definition: {
+					if p_def_actualContractFulfillment(i_contract) = p_def_maximumContractFulfillment(i_contract) then
+					    "reach-maximum"
+					elseif p_def_actualContractFulfillment(i_contract) = p_def_minimumContractFulfillment(i_contract) then
+					    "reach-minimum"
+					else 
+					    "between"    
+					endif;
+				}
 			}
 		}
 	}
