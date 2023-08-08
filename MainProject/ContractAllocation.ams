@@ -480,13 +480,13 @@ Model Main_ContractAllocation {
 				}
 				Section Export {
 					Procedure pr_exportExcelData {
-						Arguments: (sp_out_fileLocation,p_out_statusCode,sp_out_statusDescription);
+						Arguments: (FileLocation,statusCode,statusDescription);
 						Body: {
 							! we want to download a file
-							sp_out_fileLocation := sp_FileName;
+							FileLocation := sp_FileName;
 							
 							! we store the location of the file in string parameter FinalLocation
-							sp_loc_FinalLocation := webui::GetIOFilePath(sp_out_fileLocation);
+							sp_loc_FinalLocation := webui::GetIOFilePath(FileLocation);
 							
 							! writing the output file locally
 							dex::WriteToFile(
@@ -498,26 +498,26 @@ Model Main_ContractAllocation {
 							if FileExists(sp_loc_FinalLocation) then
 							
 							   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
-							   p_out_statusCode := webui::ReturnStatusCode('CREATED');
+							   statusCode := webui::ReturnStatusCode('CREATED');
 							   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
-							   sp_out_statusDescription := "Ready to download exported data!";
+							   statusDescription := "Ready to download exported data!";
 							
 							else    !if previous write statement was not successful
 							
 							   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
-							   p_out_statusCode := webui::ReturnStatusCode('ERROR');
+							   statusCode := webui::ReturnStatusCode('ERROR');
 							   !displaying a custom error message
-							   sp_out_statusDescription := "Something went wrong when creating the file.";
+							   statusDescription := "Something went wrong when creating the file.";
 							
 							endif;
 						}
-						StringParameter sp_out_fileLocation {
+						StringParameter FileLocation {
 							Property: Output;
 						}
-						Parameter p_out_statusCode {
+						Parameter statusCode {
 							Property: Output;
 						}
-						StringParameter sp_out_statusDescription {
+						StringParameter statusDescription {
 							Property: Output;
 						}
 						StringParameter sp_loc_finalLocation;
