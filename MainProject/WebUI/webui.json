@@ -59,7 +59,14 @@
                 "name": "Inputs",
                 "type": "pagev2-grid",
                 "slug": "inputs",
-                "children": []
+                "children": [
+                  {
+                    "name": "Import Page",
+                    "type": "pagev2-grid-dialog",
+                    "slug": "import_page",
+                    "children": []
+                  }
+                ]
               },
               {
                 "name": "Results",
@@ -336,6 +343,31 @@
           }
         }
       ]
+    }
+  },
+  "pages/import_page": {
+    "bindings": {
+      "literal": [
+        {
+          "widgetUri": "upload_input",
+          "gridArea": "area-a",
+          "dndId": "Unassigned widgetsupload_input"
+        }
+      ]
+    },
+    "widgets": {
+      "literal": [
+        {
+          "uri": "upload_input",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        }
+      ]
+    },
+    "aimms.widget.type": {
+      "literal": "pagev2-grid-dialog"
     }
   },
   "pages/inputs": {
@@ -1628,6 +1660,20 @@
     },
     "name": {
       "literal": "txt_welcome"
+    }
+  },
+  "widgets/upload_input": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "pr_uploadFile"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "upload"
+    },
+    "name": {
+      "literal": "upload_input"
     }
   }
 }
