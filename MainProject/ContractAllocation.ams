@@ -413,7 +413,7 @@ Model Main_ContractAllocation {
 								mappingFile :  "Mappings/inputs.xml");
 							
 							dex::ReadFromFile(
-								dataFile         :  "NothWesternStates.xlsx", 
+								dataFile         :  "DefaultData.xlsx", 
 								mappingName      :  "inputs", 
 								emptyIdentifiers :  1, 
 								emptySets        :  1, 
@@ -444,7 +444,7 @@ Model Main_ContractAllocation {
 					Procedure pr_uploadFile {
 						Arguments: (FileLocation,StatusCode,StatusDescription);
 						Body: {
-							block
+							block ! import a custom Excel file 
 							    ! we store the location of the file in string parameter UploadLocation
 							    UploadLocation := webui::GetIOFilePath(FileLocation);
 							
