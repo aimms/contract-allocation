@@ -398,10 +398,12 @@ Model Main_ContractAllocation {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
 							data 
-							{ ( 1, displaytext ) : "Import"            ,  ( 1, icon        ) : "aimms-file-upload"  ,
+							{ ( 1, displaytext ) : "Import default data"    ,  ( 1, icon        ) : "aimms-file-upload"  ,
 							  ( 1, procedure   ) : "pr_importExcelData",  ( 1, state       ) : "active"            ,
-							  ( 2, displaytext ) : "Solve"             ,  ( 2, icon        ) : "aimms-cog"         ,
-							  ( 2, procedure   ) : "mainexecution"     ,  ( 2, state       ) : "active"             }
+							  ( 2, displaytext ) : "Upload input data"    ,  ( 2, icon        ) : "aimms-file-upload"  ,
+							  ( 2, procedure   ) : "pr_openImportPage",  ( 2, state       ) : "active"            ,
+							  ( 3, displaytext ) : "Solve"             ,  ( 3, icon        ) : "aimms-cog"         ,
+							  ( 3, procedure   ) : "mainexecution"     ,  ( 3, state       ) : "active"             }
 						}
 					}
 				}
@@ -423,6 +425,74 @@ Model Main_ContractAllocation {
 							ep_actualProducer := first(i_producer);
 						}
 					}
+					Procedure pr_openImportPage {
+						Body: {
+							!Defining Dialog and actions - Only done required
+							s_actions:= data { Done };
+							ep_pageId := 'import_page';
+							
+							!Opening dialog page - no action on done - webui::NoOp1 does nothing
+							webui::OpenDialogPage(
+								pageId  :  ep_pageId, 
+								title   :  "Import Data", 
+							    actions :  s_actions, 
+								onDone  :  'webui::NoOp1');
+						}
+						Set s_actions;
+						ElementParameter ep_pageId {
+							Range: webui::AllDialogPages;
+						}
+					}
+					Procedure pr_uploadFile {
+						Arguments: (FileLocation,StatusCode,StatusDescription);
+						Body: {
+							block
+							    ! we store the location of the file in string parameter UploadLocation
+							    UploadLocation := webui::GetIOFilePath(FileLocation);
+							
+							    dex::AddMapping("inputs", "Mappings/inputs.xml");
+							
+							    if dex::ReadFromFile(
+							        dataFile         :  UploadLocation, 
+							        mappingName      :  "inputs", 
+							        emptyIdentifiers :  1, 
+							        emptySets        :  1, 
+							        resetCounters    :  1)
+							    then
+							        ! if successful, statusCode is set to 'OK' which will trigger the WebUI to show the message below in a grey box
+							        StatusCode := webui::ReturnStatusCode('OK');
+							
+							        ! displaying the status message, and logging it in the WebUI messages
+							        StatusDescription := "File was uploaded and read successfully";
+							
+							        FileDelete(UploadLocation);
+							    endif;       
+							
+							onerror ep_err do
+							    ! setting the statusCode to 'ERROR'
+							    statusCode := webui::ReturnStatusCode('ERROR');
+							
+							    !displaying a custom error message
+							    statusDescription := "Error when reading file " + errh::Message( ep_err );
+							    errh::MarkAsHandled(ep_err) ;
+							
+							    FileDelete(UploadLocation);
+							endblock;
+						}
+						StringParameter FileLocation {
+							Property: Input;
+						}
+						Parameter StatusCode {
+							Property: Output;
+						}
+						StringParameter StatusDescription {
+							Property: Output;
+						}
+						StringParameter UploadLocation;
+						ElementParameter ep_err {
+							Range: errh::PendingErrors;
+						}
+					}
 				}
 			}
 			Section Results_Page {
@@ -441,8 +511,10 @@ Model Main_ContractAllocation {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
 							data 
-							{ ( 1, displaytext ) : "Export"            ,  ( 1, icon        ) : "aimms-file-download"  ,
-							  ( 1, procedure   ) : "pr_openExportPage",  ( 1, state       ) : "active"            }
+							{ ( 1, displaytext ) : "Export"            ,  
+							  ( 1, icon        ) : "aimms-file-download"  ,
+							  ( 1, procedure   ) : "pr_openExportPage",  
+							  ( 1, state       ) : "active"            }
 						}
 					}
 				}
