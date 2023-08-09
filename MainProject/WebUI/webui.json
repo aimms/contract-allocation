@@ -279,6 +279,12 @@
         }
       ]
     },
+    "maxcolumns": {
+      "literal": 3
+    },
+    "maxrows": {
+      "literal": 2
+    },
     "widgets": {
       "literal": [
         {
@@ -346,14 +352,38 @@
     }
   },
   "pages/import_page": {
+    "aimms.widget.type": {
+      "literal": "pagev2-grid-dialog"
+    },
     "bindings": {
       "literal": [
         {
+          "widgetUri": "txt_importExplanation",
+          "gridArea": "area-a",
+          "dndId": "area-atxt_importExplanation0"
+        },
+        {
+          "widgetUri": "dwn_downloadTemplate",
+          "gridArea": "area-a",
+          "dndId": "area-adwn_downloadTemplate3"
+        },
+        {
           "widgetUri": "upload_input",
           "gridArea": "area-a",
-          "dndId": "Unassigned widgetsupload_input"
+          "dndId": "area-aupload_input1"
+        },
+        {
+          "widgetUri": "btn_importDefault",
+          "gridArea": "area-a",
+          "dndId": "area-abtn_importDefault2"
         }
       ]
+    },
+    "maxcolumns": {
+      "literal": 3
+    },
+    "maxrows": {
+      "literal": 2
     },
     "widgets": {
       "literal": [
@@ -363,11 +393,29 @@
             "width": "2",
             "height": "1"
           }
+        },
+        {
+          "uri": "btn_importDefault",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "txt_importExplanation",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
+        },
+        {
+          "uri": "dwn_downloadTemplate",
+          "layoutInfo": {
+            "width": "2",
+            "height": "1"
+          }
         }
       ]
-    },
-    "aimms.widget.type": {
-      "literal": "pagev2-grid-dialog"
     }
   },
   "pages/inputs": {
@@ -740,6 +788,23 @@
       "literal": "cbc_productionCost"
     }
   },
+  "widgets/btn_importDefault": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "pr_importExcelData"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "button"
+    },
+    "name": {
+      "literal": "btn_importDefault"
+    },
+    "title": {
+      "literal": "Import Default Data"
+    }
+  },
   "widgets/cbc_contractsInformation": {
     "aimms.widget.type": {
       "literal": "combinationchart"
@@ -1012,6 +1077,20 @@
     },
     "name": {
       "literal": "downloadExportedData"
+    }
+  },
+  "widgets/dwn_downloadTemplate": {
+    "action": {
+      "literal": {
+        "type": "procedure",
+        "value": "pr_exportExcelTemplate"
+      }
+    },
+    "aimms.widget.type": {
+      "literal": "download"
+    },
+    "name": {
+      "literal": "dwn_downloadTemplate"
     }
   },
   "widgets/exportedFileName_1": {
@@ -1640,6 +1719,17 @@
       "literal": "Production Cost"
     }
   },
+  "widgets/txt_importExplanation": {
+    "aimms.widget.type": {
+      "literal": "text"
+    },
+    "contents": {
+      "literal": "<div><span style=\"font-size: 18px;\"><b>Importing Data</b></span></div><div><br></div><div>Here you can find two ways of importing data:</div><ul><li><b>Custom Import:</b> use this if you would like to upload an Excel file different from the 'Default'. If you don't have the Excel template to import, first download a copy.</li><li><b>Default Import: </b>this is a pre-set Excel with data.</li></ul><div><br></div><div>Note that you can always change the data on the 'Default' Excel under the main directory of the project.&nbsp;&nbsp;</div>"
+    },
+    "name": {
+      "literal": "txt_importExplanation"
+    }
+  },
   "widgets/txt_problemDescription": {
     "aimms.widget.type": {
       "literal": "text"
@@ -1673,7 +1763,7 @@
       "literal": "upload"
     },
     "name": {
-      "literal": "upload_input"
+      "literal": "upl_uploadInput"
     }
   }
 }

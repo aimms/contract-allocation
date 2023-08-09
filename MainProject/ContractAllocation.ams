@@ -398,12 +398,10 @@ Model Main_ContractAllocation {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
 							data 
-							{ ( 1, displaytext ) : "Import default data"    ,  ( 1, icon        ) : "aimms-file-upload"  ,
-							  ( 1, procedure   ) : "pr_importExcelData",  ( 1, state       ) : "active"            ,
-							  ( 2, displaytext ) : "Upload input data"    ,  ( 2, icon        ) : "aimms-file-upload"  ,
-							  ( 2, procedure   ) : "pr_openImportPage",  ( 2, state       ) : "active"            ,
-							  ( 3, displaytext ) : "Solve"             ,  ( 3, icon        ) : "aimms-cog"         ,
-							  ( 3, procedure   ) : "mainexecution"     ,  ( 3, state       ) : "active"             }
+							{ ( 1, displaytext ) : "Import"           ,  ( 1, icon        ) : "aimms-file-upload",
+							  ( 1, procedure   ) : "pr_openImportPage",  ( 1, state       ) : "active"           ,
+							  ( 2, displaytext ) : "Solve"            ,  ( 2, icon        ) : "aimms-cog"        ,
+							  ( 2, procedure   ) : "mainexecution"    ,  ( 2, state       ) : "active"            }
 						}
 					}
 				}
@@ -492,6 +490,43 @@ Model Main_ContractAllocation {
 						ElementParameter ep_err {
 							Range: errh::PendingErrors;
 						}
+					}
+					Procedure pr_exportExcelTemplate {
+						Arguments: (FileLocation,statusCode,statusDescription);
+						Body: {
+							! we want to download a file
+							FileLocation := "ContractAllocationTemplate.xlsx";
+							
+							! we store the location of the file in string parameter FinalLocation
+							sp_loc_FinalLocation := webui::GetIOFilePath(FileLocation);
+							
+							! checking if the previous write statement was successful or not
+							if FileExists(sp_loc_FinalLocation) then
+							
+							   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
+							   statusCode := webui::ReturnStatusCode('CREATED');
+							   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
+							   statusDescription := "Ready to download exported data!";
+							
+							else    !if previous write statement was not successful
+							
+							   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
+							   statusCode := webui::ReturnStatusCode('ERROR');
+							   !displaying a custom error message
+							   statusDescription := "Something went wrong when creating the file.";
+							
+							endif;
+						}
+						StringParameter FileLocation {
+							Property: Output;
+						}
+						Parameter statusCode {
+							Property: Output;
+						}
+						StringParameter statusDescription {
+							Property: Output;
+						}
+						StringParameter sp_loc_finalLocation;
 					}
 				}
 			}
