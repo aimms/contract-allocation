@@ -1,0 +1,12 @@
+/*Change table default text color*/
+.tag-table .grid-viewport .cell.flag-default, 
+html:not(.using-touch) .tag-table .grid-viewport .cell.flag-default {
+    color: white;
+}
+
+/*Centering cells*/
+.tag-table .cell.flag-string .cell-wrapper, 
+.tag-table .cell.flag-number input,
+.tag-table .cell.flag-string input{
+  text-align: center;
+}

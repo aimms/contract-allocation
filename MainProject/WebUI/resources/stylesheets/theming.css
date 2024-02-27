@@ -6,17 +6,20 @@
   --primaryDark: #00B569;
   --primary90Transparent: #3ddab33b;
 
-/*---------------------------------------------------------------------
-        LOGO
-----------------------------------------------------------------------*/
-  --bg_app-logo: 15px 50% / 30px 30px no-repeat url(/app-resources/resources/images/budgeting.png);
-  --spacing_app-logo_width: 45px;
 
+  --bg_app-logo: 15px 50% / 30px 30px no-repeat url(/app-resources/resources/images/budgeting.png); /*app logo*/
+  --spacing_app-logo_width: 45px;
+  --color_border_app-header-divider: var(--primaryDark); /*line color after header*/
+  --color_bg_app-canvas: url(/app-resources/resources/images/RightBackground.png) rgb(249, 249, 249) no-repeat left/contain; /*background color*/
+  --border_widget-header: 1px solid var(--primaryDark); /*line color after widget header*/
+
+  --color_bg_workflow_current: var(--primaryDark); /*bg color when step is selected*/
+  --color_workflow_active: var(--primaryDark); /*font and icon color when step is active*/
 
   --color_bg_button_primary: var(--primaryDark);
   --color_bg_button_primary_hover: var(--primary);
   --color_text_edit-select-link: var(--primaryDark);
-
+  --color_text_edit-select-link_hover:  var(--primary);
 
 /*---------------------------------------------------------------------
         WORKFLOW

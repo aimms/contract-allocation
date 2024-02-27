@@ -380,10 +380,10 @@
       ]
     },
     "maxcolumns": {
-      "literal": 3
+      "literal": 5
     },
     "maxrows": {
-      "literal": 2
+      "literal": 1
     },
     "widgets": {
       "literal": [
@@ -1210,7 +1210,7 @@
       }
     },
     "legend.show": {
-      "literal": true
+      "literal": false
     },
     "name": {
       "literal": "cbc_producersInformation"
@@ -1724,7 +1724,7 @@
       "literal": "text"
     },
     "contents": {
-      "literal": "<div><span style=\"font-size: 18px;\"><b>Importing Data</b></span></div><div><br></div><div>Here you can find two ways of importing data:</div><div><br></div><div><b>&nbsp; Custom Import:</b> use this if you would like to upload an Excel file different from the 'Default'. If you don't have the Excel template to import, first download a copy.</div><div><b>&nbsp; Default Import: </b>this is a pre-set Excel with data.</div><div><br></div><div>Note that you can always change the data on the 'Default' Excel under the main directory of the project.&nbsp;&nbsp;</div>"
+      "literal": "<div><span style=\"font-size: 18px;\"><b>Importing Data</b></span></div><div><br></div><div>Here you can find two ways of importing data:</div><div><br></div><ul><li><b>Custom Import:</b> use this if you would like to upload an Excel file different from the 'Default'. If you don't have the Excel template to import, first download a copy.</li><li><b>Default Import: </b>this is a pre-set Excel with data.</li></ul><div><br></div><div>Note that you can always change the data on the 'Default' Excel under the main directory of the project.&nbsp;&nbsp;</div>"
     },
     "name": {
       "literal": "txt_importExplanation"

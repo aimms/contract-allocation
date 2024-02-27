@@ -1,4 +1,0 @@
-/*Change color of the busy button*/
-.veil-msg.state-busy .ui-button {
-  background-color: var(--primary);
-}
