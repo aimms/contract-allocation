@@ -233,7 +233,7 @@
       "literal": {
         "componentName": "Grid",
         "props": {
-          "gridTemplateColumns": "2fr 1fr 1fr 1fr",
+          "gridTemplateColumns": "2fr 1fr 2fr 2fr",
           "gridTemplateRows": "1fr 1fr",
           "gridTemplateAreas": "\"area-a area-a area-a area-c\" \"area-d area-d area-b area-b\""
         },
@@ -637,11 +637,11 @@
     "secondarypageactions": {
       "aimms": {
         "contents": [
-          "sp_resultsSecondaryActions"
+          "sp_inputSecondaryActions"
         ],
         "slices": [
           {
-            "identifier": "sp_resultsSecondaryActions",
+            "identifier": "sp_inputSecondaryActions",
             "slice": [
               {
                 "index": "webui::indexPageExtension",
@@ -816,7 +816,7 @@
     "action": {
       "literal": {
         "type": "procedure",
-        "value": "pr_importExcelData"
+        "value": "pr_importDefaultExcel"
       }
     },
     "aimms.widget.type": {
@@ -1142,6 +1142,9 @@
     },
     "name": {
       "literal": "exportedFileName"
+    },
+    "views": {
+      "literal": {}
     }
   },
   "widgets/img_homeLogo": {
@@ -1285,7 +1288,7 @@
     "contents": {
       "aimms": {
         "contents": [
-          "ep_selectedMapping"
+          "ep_def_selectedMapping"
         ],
         "slices": []
       }

@@ -398,15 +398,91 @@ Model Main_ContractAllocation {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
 							data 
-							{ ( 1, displaytext ) : "Import"           ,  ( 1, icon        ) : "aimms-file-upload",
-							  ( 1, procedure   ) : "pr_openImportPage",  ( 1, state       ) : "active"           ,
-							  ( 2, displaytext ) : "Solve"            ,  ( 2, icon        ) : "aimms-cog"        ,
-							  ( 2, procedure   ) : "mainexecution"    ,  ( 2, state       ) : "active"            }
+							{ ( 1, displaytext ) : "Download Excel Template",  ( 1, icon        ) : "aimms-file-excel"       ,
+							  ( 1, procedure   ) : "pr_requestTemplate"     ,  ( 1, state       ) : "active"                 ,
+							  ( 2, displaytext ) : "Import Custom Excel"    ,  ( 2, icon        ) : "aimms-file-upload"      ,
+							  ( 2, procedure   ) : "pr_requestCustomExcel"  ,  ( 2, state       ) : "active"                 ,
+							  ( 3, displaytext ) : "Import Default Excel"   ,  ( 3, icon        ) : "aimms-file-text2"       ,
+							  ( 3, procedure   ) : "pr_importDefaultExcel"  ,  ( 3, state       ) : "active"                 ,
+							  ( 4, displaytext ) : "Solve"                  ,  ( 4, icon        ) : "aimms-cog"              ,
+							  ( 4, procedure   ) : "mainexecution"          ,  ( 4, state       ) : "active"                 ,
+							  ( 5, displaytext ) : "Download Results Excel" ,  ( 5, icon        ) : "aimms-file-download"    ,
+							  ( 5, procedure   ) : "pr_requestResults"      ,  ( 5, state       ) : "active"                  }
 						}
 					}
 				}
 				Section Import {
-					Procedure pr_importExcelData {
+					Procedure pr_requestTemplate {
+						Body: {
+							sp_loc_fileName := "ContractAllocationTemplate.xlsx";
+							sp_loc_IOPath := webui::GetIOFilePath(sp_loc_fileName);
+							
+							!this is required so it works on the cloud
+							FileCopy(sp_loc_fileName, sp_loc_IOPath);
+							
+							if FileExists(sp_loc_IOPath) then
+							    webui::RequestFileDownload(sp_loc_IOPath);
+							else
+							    webui::ShowMessage('error',"File not found.");
+							endif;
+						}
+						StringParameter sp_loc_fileName;
+						StringParameter sp_loc_IOPath;
+					}
+					Procedure pr_requestCustomExcel {
+						Body: {
+							webui::RequestFileUpload(onDone :  'pr_uploadFile');
+						}
+					}
+					Procedure pr_uploadFile {
+						Arguments: (fname,StatusCode,StatusDescription);
+						Body: {
+							block ! import a custom Excel file 
+							    ! we store the location of the file in string parameter UploadLocation
+							    UploadLocation := webui::GetIOFilePath(fname);
+							
+							    dex::AddMapping("inputs", "Mappings/inputs.xml");
+							
+							    if dex::ReadFromFile(
+							        dataFile         :  UploadLocation, 
+							        mappingName      :  "inputs", 
+							        emptyIdentifiers :  1, 
+							        emptySets        :  1, 
+							        resetCounters    :  1)
+							    then
+							
+							        ! displaying the status message, and logging it in the WebUI messages
+							        sp_loc_message := "File was uploaded and read successfully";
+							        webui::ShowMessage('info', sp_loc_message);
+							
+							    endif;       
+							
+							onerror ep_err do
+							
+							    !displaying a custom error message
+							    sp_loc_message := "Error when reading file " + errh::Message( ep_err );
+							    webui::ShowMessage('error', sp_loc_message);
+							
+							    errh::MarkAsHandled(ep_err) ;
+							
+							endblock;
+						}
+						StringParameter fname {
+							Property: Input;
+						}
+						Parameter StatusCode {
+							Property: Output;
+						}
+						StringParameter StatusDescription {
+							Property: Output;
+						}
+						StringParameter sp_loc_message;
+						StringParameter UploadLocation;
+						ElementParameter ep_err {
+							Range: errh::PendingErrors;
+						}
+					}
+					Procedure pr_importDefaultExcel {
 						Body: {
 							dex::AddMapping(
 								mappingName :  "inputs", 
@@ -422,111 +498,6 @@ Model Main_ContractAllocation {
 							ep_actualContract := first(i_contract);
 							ep_actualProducer := first(i_producer);
 						}
-					}
-					Procedure pr_openImportPage {
-						Body: {
-							!Defining Dialog and actions - Only done required
-							s_actions:= data { Done };
-							ep_pageId := 'import_page';
-							
-							!Opening dialog page - no action on done - webui::NoOp1 does nothing
-							webui::OpenDialogPage(
-								pageId  :  ep_pageId, 
-								title   :  "Import Data", 
-							    actions :  s_actions, 
-								onDone  :  'webui::NoOp1');
-						}
-						Set s_actions;
-						ElementParameter ep_pageId {
-							Range: webui::AllDialogPages;
-						}
-					}
-					Procedure pr_uploadFile {
-						Arguments: (FileLocation,StatusCode,StatusDescription);
-						Body: {
-							block ! import a custom Excel file 
-							    ! we store the location of the file in string parameter UploadLocation
-							    UploadLocation := webui::GetIOFilePath(FileLocation);
-							
-							    dex::AddMapping("inputs", "Mappings/inputs.xml");
-							
-							    if dex::ReadFromFile(
-							        dataFile         :  UploadLocation, 
-							        mappingName      :  "inputs", 
-							        emptyIdentifiers :  1, 
-							        emptySets        :  1, 
-							        resetCounters    :  1)
-							    then
-							        ! if successful, statusCode is set to 'OK' which will trigger the WebUI to show the message below in a grey box
-							        StatusCode := webui::ReturnStatusCode('OK');
-							
-							        ! displaying the status message, and logging it in the WebUI messages
-							        StatusDescription := "File was uploaded and read successfully";
-							
-							        FileDelete(UploadLocation);
-							    endif;       
-							
-							onerror ep_err do
-							    ! setting the statusCode to 'ERROR'
-							    statusCode := webui::ReturnStatusCode('ERROR');
-							
-							    !displaying a custom error message
-							    statusDescription := "Error when reading file " + errh::Message( ep_err );
-							    errh::MarkAsHandled(ep_err) ;
-							
-							    FileDelete(UploadLocation);
-							endblock;
-						}
-						StringParameter FileLocation {
-							Property: Input;
-						}
-						Parameter StatusCode {
-							Property: Output;
-						}
-						StringParameter StatusDescription {
-							Property: Output;
-						}
-						StringParameter UploadLocation;
-						ElementParameter ep_err {
-							Range: errh::PendingErrors;
-						}
-					}
-					Procedure pr_exportExcelTemplate {
-						Arguments: (FileLocation,statusCode,statusDescription);
-						Body: {
-							! we want to download a file
-							FileLocation := "ContractAllocationTemplate.xlsx";
-							
-							! we store the location of the file in string parameter FinalLocation
-							sp_loc_FinalLocation := webui::GetIOFilePath(FileLocation);
-							
-							! checking if the previous write statement was successful or not
-							if FileExists(sp_loc_FinalLocation) then
-							
-							   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
-							   statusCode := webui::ReturnStatusCode('CREATED');
-							   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
-							   statusDescription := "Ready to download exported data!";
-							
-							else    !if previous write statement was not successful
-							
-							   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
-							   statusCode := webui::ReturnStatusCode('ERROR');
-							   !displaying a custom error message
-							   statusDescription := "Something went wrong when creating the file.";
-							
-							endif;
-						}
-						StringParameter FileLocation {
-							Property: Output;
-						}
-						Parameter statusCode {
-							Property: Output;
-						}
-						StringParameter statusDescription {
-							Property: Output;
-						}
-						StringParameter sp_loc_finalLocation;
 					}
 				}
 			}
@@ -544,90 +515,39 @@ Model Main_ContractAllocation {
 				DeclarationSection Results_PageAction {
 					StringParameter sp_resultsSecondaryActions {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
-						Definition: {
-							data 
-							{ ( 1, displaytext ) : "Export"            ,  
-							  ( 1, icon        ) : "aimms-file-download"  ,
-							  ( 1, procedure   ) : "pr_openExportPage",  
-							  ( 1, state       ) : "active"            }
-						}
-					}
-				}
-				Procedure pr_openExportPage {
-					Body: {
-						!Generating all possible mappings
-						dex::GenerateDatasetMappings();
-						
-						!Selecting the Excel mapping as initial value
-						if not ep_selectedMapping then
-						    ep_selectedMapping 
-						    :=  First(i_generatedMappings | FindString(
-						            SearchString  :  i_generatedMappings, 
-						            Key           :  "excel", 
-						            CaseSensitive :  0, 
-						            WordOnly      :  0, 
-						            IgnoreWhite   :  0));
-						endif;
-						
-						!Defining Dialog and actions - Only done required
-						s_actions:= data { Done };
-						ep_pageId := 'export_page';
-						
-						!Opening dialog page - no action on done - webui::NoOp1 does nothing
-						webui::OpenDialogPage(
-							pageId  :  ep_pageId, 
-							title   :  "Export Data", 
-						    actions :  s_actions, 
-							onDone  :  'webui::NoOp1');
-					}
-					Set s_actions;
-					ElementParameter ep_pageId {
-						Range: webui::AllDialogPages;
+						Definition: sp_inputSecondaryActions(webui::indexPageExtension, webui::indexPageActionSpec);
 					}
 				}
 				Section Export {
-					Procedure pr_exportExcelData {
-						Arguments: (FileLocation,statusCode,statusDescription);
+					Procedure pr_requestResults {
 						Body: {
-							! we want to download a file
-							FileLocation := sp_FileName;
+							dex::GenerateDatasetMappings();
 							
-							! we store the location of the file in string parameter FinalLocation
-							sp_loc_FinalLocation := webui::GetIOFilePath(FileLocation);
+							sp_loc_fileName := "Results.xlsx";
+							
+							FileCopy("empty.xlsx", sp_loc_fileName);
 							
 							! writing the output file locally
 							dex::WriteToFile(
-							    dataFile    :  sp_loc_FinalLocation, 
-								mappingName :  ep_selectedMapping, 
+							    dataFile    :  sp_loc_fileName, 
+								mappingName :  ep_def_selectedMapping, 
 								pretty      :  1);
 							
-							! checking if the previous write statement was successful or not
-							if FileExists(sp_loc_FinalLocation) then
+							sp_loc_IOPath := webui::GetIOFilePath(sp_loc_fileName);
 							
-							   ! if successful, statusCode is set to 'CREATED' which will trigger the download widget to show the Get button
-							   statusCode := webui::ReturnStatusCode('CREATED');
-							   ! displaying the status message as Ready to download exported data! instead of the default "File ready to download"
-							   statusDescription := "Ready to download exported data!";
+							!this is required so it works on the cloud
+							FileCopy(sp_loc_fileName, sp_loc_IOPath);
 							
-							else    !if previous write statement was not successful
+							if FileExists(sp_loc_IOPath) then
+							    webui::RequestFileDownload(sp_loc_IOPath);
+							    webui::ShowMessage('info',"Export complete.");
 							
-							   ! setting the statusCode to 'ERROR' and the download widget will not show the Get button anymore
-							   statusCode := webui::ReturnStatusCode('ERROR');
-							   !displaying a custom error message
-							   statusDescription := "Something went wrong when creating the file.";
-							
+							else
+							    webui::ShowMessage('error',"Something went wrong when creating the file.");
 							endif;
 						}
-						StringParameter FileLocation {
-							Property: Output;
-						}
-						Parameter statusCode {
-							Property: Output;
-						}
-						StringParameter statusDescription {
-							Property: Output;
-						}
-						StringParameter sp_loc_finalLocation;
+						StringParameter sp_loc_fileName;
+						StringParameter sp_loc_IOPath;
 					}
 					DeclarationSection Export_Identifiers {
 						Index i_contractExport {
@@ -667,9 +587,18 @@ Model Main_ContractAllocation {
 							Default: "Your File Name Here.xlsx";
 							Comment: "file name of exported data";
 						}
-						ElementParameter ep_selectedMapping {
+						ElementParameter ep_def_selectedMapping {
 							Range: s_generatedMappings;
 							Default: '';
+							Definition: {
+								First(i_generatedMappings | 
+								        FindString(
+								            SearchString  :  i_generatedMappings, 
+								            Key           :  "excel", 
+								            CaseSensitive :  0, 
+								            WordOnly      :  0, 
+								            IgnoreWhite   :  0));
+							}
 							Comment: "selected generated mapping for export";
 						}
 						Set s_generatedMappings {
@@ -690,7 +619,11 @@ Model Main_ContractAllocation {
 			}
 		}
 	}
-	Procedure MainInitialization;
+	Procedure MainInitialization {
+		Body: {
+			dex::GenerateDatasetMappings();
+		}
+	}
 	Procedure PostMainInitialization {
 		Comment: {
 			"Add initialization statements here that require that the libraries are already initialized properly,

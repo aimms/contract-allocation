@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<AimmsExcelMapping dense-children="1">
+	<ExcelSheetMapping name="Allocation per Producer">
+		<RowMapping>
+			<ColumnMapping name="Producer" binds-to="i_producerExport" />
+			<ColumnMapping name="Contract" binds-to="i_contractExport" />
+			<ColumnMapping name="Generation" maps-to="p_generation(i_producerExport,i_contractExport)" />
+		</RowMapping>
+	</ExcelSheetMapping>
+</AimmsExcelMapping>

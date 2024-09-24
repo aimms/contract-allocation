@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<AimmsCSVMapping>
+<AimmsCSVMapping dense-children="1">
 	<RowMapping name="Contract Allocation">
 		<ColumnMapping name="Contract" binds-to="i_contractExport" />
 		<ColumnMapping name="Total Generation" maps-to="p_totalGeneration(i_contractExport)" />

@@ -1,0 +1,9 @@
+<?xml version="1.0"?>
+<AimmsExcelMapping dense-children="1">
+	<ExcelSheetMapping name="Contract Allocation">
+		<RowMapping>
+			<ColumnMapping name="Contract" binds-to="i_contractExport" />
+			<ColumnMapping name="Total Generation" maps-to="p_totalGeneration(i_contractExport)" />
+		</RowMapping>
+	</ExcelSheetMapping>
+</AimmsExcelMapping>

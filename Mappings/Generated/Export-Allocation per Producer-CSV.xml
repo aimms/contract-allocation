@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<AimmsCSVMapping>
+<AimmsCSVMapping dense-children="1">
 	<RowMapping name="Allocation per Producer">
 		<ColumnMapping name="Producer" binds-to="i_producerExport" />
 		<ColumnMapping name="Contract" binds-to="i_contractExport" />
