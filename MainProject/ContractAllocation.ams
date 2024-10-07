@@ -452,7 +452,7 @@ Model Main_ContractAllocation {
 							    then
 							
 							        ! displaying the status message, and logging it in the WebUI messages
-							        sp_loc_message := "File was uploaded and read successfully";
+							        sp_loc_message := "File was uploaded and read successfully.";
 							        webui::ShowMessage('info', sp_loc_message);
 							
 							    endif;       
@@ -460,7 +460,7 @@ Model Main_ContractAllocation {
 							onerror ep_err do
 							
 							    !displaying a custom error message
-							    sp_loc_message := "Error when reading file " + errh::Message( ep_err );
+							    sp_loc_message := "Error when reading file " + errh::Message( ep_err ) + ".";
 							    webui::ShowMessage('error', sp_loc_message);
 							
 							    errh::MarkAsHandled(ep_err) ;
