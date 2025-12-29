@@ -10,3 +10,7 @@ html:not(.using-touch) .tag-table .grid-viewport .cell.flag-default {
 .tag-table .cell.flag-string input{
   text-align: center;
 }
+
+.ql-snow a {
+  color: var(--primaryDark);
+}
