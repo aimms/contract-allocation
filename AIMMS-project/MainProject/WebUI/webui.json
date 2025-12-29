@@ -808,6 +808,9 @@
     "name": {
       "literal": "cbc_productionCost"
     },
+    "title": {
+      "literal": "Production Cost"
+    },
     "views": {
       "literal": {}
     }
@@ -917,6 +920,9 @@
     },
     "name": {
       "literal": "cbc_contractsInformation"
+    },
+    "title": {
+      "literal": "Contract Information"
     },
     "transparency.index": {
       "literal": "i_contract"
@@ -1250,6 +1256,9 @@
     },
     "name": {
       "literal": "cbc_producersInformation"
+    },
+    "title": {
+      "literal": "Producers Information"
     },
     "views": {
       "literal": {}

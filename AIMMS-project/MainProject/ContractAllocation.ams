@@ -10,13 +10,7 @@ Model Main_ContractAllocation {
 			Quantity SI_Time_Duration {
 				BaseUnit: s;
 				Conversions: minute->s : #-># * 60;
-				Comment: {
-					"Expresses the value for the duration of periods.
-					
-					The unit s has been added automatically because it is a required unit for AimmsWebUI.
-					
-					The unit minute has been added automatically because it is a required unit for AimmsWebUI."
-				}
+				Comment: "Duration of periods";
 			}
 			Quantity SI_Mass {
 				BaseUnit: kg;
@@ -24,6 +18,7 @@ Model Main_ContractAllocation {
 			}
 			Quantity q_monetary {
 				BaseUnit: $;
+				Comment: "Currency identifier.";
 			}
 			Quantity SI_Unitless {
 				BaseUnit: -;
@@ -44,6 +39,7 @@ Model Main_ContractAllocation {
 					Range: nonnegative;
 					Unit: kg;
 					InitialData: 0;
+					Comment: "Max capacity per producer.";
 					webui::AnnotationsIdentifier: p_availableCapacityAnnotation;
 				}
 				Parameter p_minimalDelivery {
@@ -52,6 +48,7 @@ Model Main_ContractAllocation {
 					Range: nonnegative;
 					Unit: kg;
 					InitialData: 0;
+					Comment: "Min delivery threshold.";
 					webui::AnnotationsIdentifier: p_minimalDeliveryAnnotation;
 				}
 			}
@@ -60,6 +57,7 @@ Model Main_ContractAllocation {
 					Text: "The set of all contracts";
 					Index: i_contract, i_contract1;
 					Parameter: ep_contract;
+					Comment: "Collection of contracts.";
 				}
 				Parameter p_minimumContractFulfillment {
 					IndexDomain: (i_contract);
@@ -67,6 +65,7 @@ Model Main_ContractAllocation {
 					Range: nonnegative;
 					Unit: kg;
 					InitialData: 0;
+					Comment: "Min fulfillment requirement.";
 					webui::AnnotationsIdentifier: sp_minimumContractFulfillmentAnnotation;
 				}
 				Parameter p_maximumContractFulfillment {
@@ -76,6 +75,7 @@ Model Main_ContractAllocation {
 					Unit: kg;
 					Default: inf;
 					InitialData: inf;
+					Comment: "Max fulfillment limit.";
 					webui::AnnotationsIdentifier: sp_maximumContractFulfillmentAnnotation;
 				}
 				Parameter p_minimalNumberofContributors {
@@ -83,6 +83,7 @@ Model Main_ContractAllocation {
 					Text: "Minimal number of producers that delivery to a contract";
 					Range: integer;
 					InitialData: 0;
+					Comment: "Min contributors required.";
 					webui::AnnotationsIdentifier: sp_minimalNumberofContributorsAnnotation;
 				}
 			}
@@ -92,6 +93,7 @@ Model Main_ContractAllocation {
 					Text: "Unit cost for delivery by producer p for contract c";
 					Unit: $/kg;
 					InitialData: 0;
+					Comment: "Unit cost for delivery by producer p for contract c.";
 					webui::AnnotationsIdentifier: sp_productionCostAnnotation;
 				}
 			}
@@ -101,6 +103,7 @@ Model Main_ContractAllocation {
 				Text: "Total cost of all deliveries";
 				Unit: $;
 				Definition: sum((i_producer,i_contract), p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract));
+				Comment: "Total objective cost.";
 			}
 			Variable v_generation {
 				IndexDomain: (i_producer,i_contract);
@@ -108,11 +111,13 @@ Model Main_ContractAllocation {
 				Range: [p_minimalDelivery(i_producer), 10000);
 				Unit: kg;
 				Property: SemiContinuous;
+				Comment: "Quantity allocated.";
 			}
 			Variable v_generationIncidence {
 				IndexDomain: (i_producer,i_contract);
 				Text: "Producers p produce for contract c";
 				Range: binary;
+				Comment: "Assignment indicator.";
 			}
 			Constraint c_capacity {
 				IndexDomain: (i_producer);
@@ -123,6 +128,7 @@ Model Main_ContractAllocation {
 					<= 
 					p_availableCapacity(i_producer)
 				}
+				Comment: "Producer capacity constraint.";
 			}
 			Constraint c_minimumContractFullfillment {
 				IndexDomain: (i_contract);
@@ -133,6 +139,7 @@ Model Main_ContractAllocation {
 					>= 
 					p_minimumContractFulfillment(i_contract)
 				}
+				Comment: "Min fulfillment constraint.";
 			}
 			Constraint c_maximumContractFullfillment {
 				IndexDomain: (i_contract);
@@ -143,6 +150,7 @@ Model Main_ContractAllocation {
 					<= 
 					p_maximumContractFulfillment(i_contract)
 				}
+				Comment: "Max fulfillment constraint.";
 			}
 			Constraint c_contractContribution {
 				IndexDomain: (i_contract);
@@ -152,6 +160,7 @@ Model Main_ContractAllocation {
 					>= 
 					p_minimalNumberofContributors(i_contract)
 				}
+				Comment: "Diversity constraint.";
 			}
 			Constraint c_generationIncidenceDetermination {
 				IndexDomain: (i_producer,i_contract);
@@ -161,9 +170,9 @@ Model Main_ContractAllocation {
 					v_generation(i_producer,i_contract) 
 					>= 
 					p_minimalDelivery(i_producer) 
-					* 
-					v_generationIncidence(i_producer,i_contract)
+					* v_generationIncidence(i_producer,i_contract)
 				}
+				Comment: "Incidence linking constraint.";
 			}
 			MathematicalProgram mp_contractAllocation {
 				Objective: v_totalCost;
@@ -171,37 +180,45 @@ Model Main_ContractAllocation {
 				Constraints: AllConstraints;
 				Variables: AllVariables;
 				Type: MIP;
+				Comment: "Mathematical program definition.";
 			}
 			DeclarationSection Model_Information {
 				ElementParameter ep_programStatus {
 					Range: AllSolutionStates;
+					Comment: "Solver status.";
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}
 				Parameter p_gap {
+					Comment: "Solution gap.";
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}
 				Parameter p_numberOfConstraints {
+					Comment: "Constraint count.";
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}
 				Parameter p_numberOfVariables {
+					Comment: "Variable count.";
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}
 				Parameter p_solutionTime {
 					Unit: s;
 					Property: NoSave;
 					InitialData: 0;
+					Comment: "Time to solve.";
 					webui::FlagsIdentifier: sp_readOnlyFlag;
 				}
 			}
 			Procedure pr_modelInformation {
 				Body: {
+					! Clear previous model metadata
 					empty Model_Information;
 					
-					ep_programStatus := mp_contractAllocation.ProgramStatus;
-					p_gap := abs(1 - (mp_contractAllocation.Objective /$ mp_contractAllocation.BestBound));
-					p_solutionTime := mp_contractAllocation.SolutionTime;
-					p_numberOfConstraints := mp_contractAllocation.NumberOfConstraints;
-					p_numberOfVariables := mp_contractAllocation.NumberOfVariables;
+					! Capture solver results and model statistics
+					ep_programStatus      := mp_contractAllocation.ProgramStatus;      ! Solver status (e.g., Optimal, Infeasible)
+					p_gap                 := abs(1 - (mp_contractAllocation.Objective / $mp_contractAllocation.BestBound)); ! Relative optimality gap
+					p_solutionTime        := mp_contractAllocation.SolutionTime;       ! Total time taken by the solver
+					p_numberOfConstraints := mp_contractAllocation.NumberOfConstraints; ! Total rows in the matrix
+					p_numberOfVariables   := mp_contractAllocation.NumberOfVariables;   ! Total columns in the matrix
 				}
 			}
 		}
@@ -209,25 +226,30 @@ Model Main_ContractAllocation {
 			Parameter p_def_actualnumberOfContributors {
 				IndexDomain: i_contract;
 				Definition: sum(i_producer | v_generation(i_producer, i_contract), 1);
+				Comment: "Actual contributor count.";
 			}
 			Parameter p_def_minNumberOfContributors {
 				IndexDomain: i_contract;
 				Definition: p_minimalNumberofContributors(i_contract);
+				Comment: "Minimum contributor target.";
 			}
 			Parameter p_def_totalDelivery {
 				IndexDomain: i_producer;
 				Unit: kg;
 				Definition: sum(i_contract, v_generation(i_producer,i_contract));
+				Comment: "Total delivery per producer.";
 			}
 			Parameter p_def_availableCapacity {
 				IndexDomain: i_producer;
 				Unit: kg;
 				Definition: p_availableCapacity(i_producer);
+				Comment: "Available capacity value.";
 			}
 			Parameter p_def_minimalDelivery {
 				IndexDomain: i_producer;
 				Unit: kg;
 				Definition: p_minimalDelivery(i_producer);
+				Comment: "Minimal delivery value.";
 			}
 			Parameter p_def_minimumContractFulfillment {
 				IndexDomain: (i_contract);
@@ -235,6 +257,7 @@ Model Main_ContractAllocation {
 				Range: nonnegative;
 				Unit: kg;
 				Definition: p_minimumContractFulfillment(i_contract);
+				Comment: "Min fulfillment value.";
 			}
 			Parameter p_def_maximumContractFulfillment {
 				IndexDomain: (i_contract);
@@ -243,12 +266,14 @@ Model Main_ContractAllocation {
 				Unit: kg;
 				Default: inf;
 				Definition: p_maximumContractFulfillment(i_contract);
+				Comment: "Max fulfillment value.";
 			}
 			Parameter p_def_actualContractFulfillment {
 				IndexDomain: (i_contract);
 				Range: nonnegative;
 				Unit: kg;
 				Definition: sum(i_producer, v_generation(i_producer,i_contract));
+				Comment: "Calculated actual fulfillment.";
 				webui::AnnotationsIdentifier: sp_def_bgColorActualContractFulfillment;
 			}
 			StringParameter sp_def_bgColorActualContractFulfillment {
@@ -262,6 +287,7 @@ Model Main_ContractAllocation {
 					    "between"    
 					endif;
 				}
+				Comment: "Color status logic.";
 			}
 		}
 	}
@@ -269,20 +295,24 @@ Model Main_ContractAllocation {
 		Procedure pr_empty;
 		StringParameter sp_logo {
 			Definition: "aimms_logo.png";
+			Comment: "UI logo path.";
 		}
 		ElementParameter ep_actualProducer {
 			Text: "Element parameter used to link Gantt chart with message";
 			Range: s_producers;
 			InitialData: '';
+			Comment: "Selected producer pointer.";
 		}
 		ElementParameter ep_actualContract {
 			Text: "Element parameter used to link Gantt chart with message";
 			Range: s_contracts;
 			InitialData: '';
+			Comment: "Selected contract pointer.";
 		}
 		Section Workflow {
 			StringParameter sp_myWorkflows {
 				IndexDomain: (webui::indexWorkflowOrder,webui::indexWorkflowSpec);
+				Comment: "Workflow configuration.";
 			}
 			StringParameter sp_myWorkflowSteps {
 				IndexDomain: (webui::indexWorkflowOrder,webui::indexNoOfPages,webui::indexWorkflowPageSpec);
@@ -303,6 +333,7 @@ Model Main_ContractAllocation {
 					  ( 1, 4, tooltip           ) : "Model outputs"      ,  ( 1, 4, workflowPageState ) : "active"             ,
 					  ( 1, 4, pageDataState     ) : "Incomplete"         ,  ( 1, 4, redirectPageId    ) : "home"                }
 				}
+				Comment: "Workflow steps configuration.";
 			}
 		}
 		Section Pages {
@@ -321,6 +352,7 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
+						Comment: "Contributor annotation parameter.";
 					}
 					StringParameter sp_minimumContractFulfillmentAnnotation {
 						IndexDomain: i_contract;
@@ -335,6 +367,7 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
+						Comment: "Min fulfillment annotation parameter.";
 					}
 					StringParameter sp_maximumContractFulfillmentAnnotation {
 						IndexDomain: i_contract;
@@ -349,6 +382,7 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
+						Comment: "Max fulfillment annotation parameter.";
 					}
 					StringParameter p_minimalDeliveryAnnotation {
 						IndexDomain: i_producer;
@@ -363,6 +397,7 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
+						Comment: "Min delivery annotation parameter.";
 					}
 					StringParameter p_availableCapacityAnnotation {
 						IndexDomain: i_producer;
@@ -377,6 +412,7 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
+						Comment: "Capacity annotation parameter.";
 					}
 					StringParameter sp_productionCostAnnotation {
 						IndexDomain: (i_producer, i_contract);
@@ -391,6 +427,7 @@ Model Main_ContractAllocation {
 							
 							endif
 						}
+						Comment: "Production cost annotation parameter.";
 					}
 				}
 				DeclarationSection Input_PageAction {
@@ -409,25 +446,31 @@ Model Main_ContractAllocation {
 							  ( 5, displaytext ) : "Download Results Excel" ,  ( 5, icon        ) : "aimms-file-download"    ,
 							  ( 5, procedure   ) : "pr_requestResults"      ,  ( 5, state       ) : "active"                  }
 						}
+						Comment: "Secondary UI actions configuration.";
 					}
 				}
 				Section Import {
 					Procedure pr_requestTemplate {
 						Body: {
+							! Set the template filename and retrieve the necessary cloud-compatible path
 							sp_loc_fileName := "ContractAllocationTemplate.xlsx";
 							sp_loc_IOPath := webui::GetIOFilePath(sp_loc_fileName);
-							
-							!this is required so it works on the cloud
+							! Copy the local template to the IO path to ensure accessibility in cloud environments
 							FileCopy(sp_loc_fileName, sp_loc_IOPath);
 							
+							! Verify file existence and initiate the download or display an error
 							if FileExists(sp_loc_IOPath) then
-							    webui::RequestFileDownload(sp_loc_IOPath);
+							    webui::RequestFileDownload(sp_loc_IOPath); ! Prompt the user to save the file
 							else
-							    webui::ShowMessage('error',"File not found.");
+							    webui::ShowMessage('error',"File not found."); ! Notify user of missing file
 							endif;
 						}
-						StringParameter sp_loc_fileName;
-						StringParameter sp_loc_IOPath;
+						StringParameter sp_loc_fileName {
+							Comment: "Template file name";
+						}
+						StringParameter sp_loc_IOPath {
+							Comment: "Cloud IO path";
+						}
 					}
 					Procedure pr_requestCustomExcel {
 						Body: {
@@ -437,66 +480,78 @@ Model Main_ContractAllocation {
 					Procedure pr_uploadFile {
 						Arguments: (fname,StatusCode,StatusDescription);
 						Body: {
-							block ! import a custom Excel file 
-							    ! we store the location of the file in string parameter UploadLocation
+							block ! Process custom Excel file import
+							    ! Get the temporary storage path for the uploaded file
 							    UploadLocation := webui::GetIOFilePath(fname);
-							
+							    ! Load the mapping definition for input data
 							    dex::AddMapping("inputs", "Mappings/inputs.xml");
 							
+							    ! Read data from the file and reset existing model data
 							    if dex::ReadFromFile(
 							        dataFile         :  UploadLocation, 
 							        mappingName      :  "inputs", 
-							        emptyIdentifiers :  1, 
-							        emptySets        :  1, 
-							        resetCounters    :  1)
+							        emptyIdentifiers :  1,  ! Clear current parameter values before reading
+							        emptySets        :  1,  ! Clear current sets before reading
+							        resetCounters    :  1) ! Reset set element counters
 							    then
 							
-							        ! displaying the status message, and logging it in the WebUI messages
+							        ! Notify user of successful import
 							        sp_loc_message := "File was uploaded and read successfully.";
 							        webui::ShowMessage('info', sp_loc_message);
 							
-							    endif;       
+							    endif;        
 							
-							onerror ep_err do
+							onerror ep_err do ! Catch and handle any errors during the import block
 							
-							    !displaying a custom error message
+							    ! Display detailed error message to the WebUI
 							    sp_loc_message := "Error when reading file " + errh::Message( ep_err ) + ".";
 							    webui::ShowMessage('error', sp_loc_message);
 							
+							    ! Mark error as handled to allow the session to continue
 							    errh::MarkAsHandled(ep_err) ;
 							
 							endblock;
 						}
 						StringParameter fname {
 							Property: Input;
+							Comment: "File name argument";
 						}
 						Parameter StatusCode {
 							Property: Output;
+							Comment: "Output status code";
 						}
 						StringParameter StatusDescription {
 							Property: Output;
+							Comment: "Output status text";
 						}
-						StringParameter sp_loc_message;
-						StringParameter UploadLocation;
+						StringParameter sp_loc_message {
+							Comment: "Local message parameter";
+						}
+						StringParameter UploadLocation {
+							Comment: "Upload location parameter";
+						}
 						ElementParameter ep_err {
 							Range: errh::PendingErrors;
+							Comment: "Error pointer";
 						}
 					}
 					Procedure pr_importDefaultExcel {
 						Body: {
+							! Register the mapping definition for the initial input data
 							dex::AddMapping(
 								mappingName :  "inputs", 
 								mappingFile :  "Mappings/inputs.xml");
-							
+							! Import default data from Excel and clear current model state
 							dex::ReadFromFile(
 								dataFile         :  "DefaultData.xlsx", 
 								mappingName      :  "inputs", 
-								emptyIdentifiers :  1, 
-								emptySets        :  1, 
-								resetCounters    :  1);
+								emptyIdentifiers :  1,  ! Clear all existing parameter values
+								emptySets        :  1,  ! Clear all existing set elements
+								resetCounters    :  1); ! Reset element numbering/counters
 							
-							ep_actualContract := first(i_contract);
-							ep_actualProducer := first(i_producer);
+							! Initialize selection pointers to the first available elements
+							ep_actualContract := first(i_contract); ! Set pointer to the first contract in the set
+							ep_actualProducer := first(i_producer); ! Set pointer to the first producer in the set
 						}
 					}
 				}
@@ -510,60 +565,68 @@ Model Main_ContractAllocation {
 							{ ( 1, displayText ) : "Model Information",  ( 1, pageId      ) : "model_information",
 							  ( 1, icon        ) : "aimms-info"       ,  ( 1, state       ) : "active"            }
 						}
+						Comment: "Result side panel configuration.";
 					}
 				}
 				DeclarationSection Results_PageAction {
 					StringParameter sp_resultsSecondaryActions {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: sp_inputSecondaryActions(webui::indexPageExtension, webui::indexPageActionSpec);
+						Comment: "Results page secondary actions configuration.";
 					}
 				}
 				Section Export {
 					Procedure pr_requestResults {
 						Body: {
+							! Automatically refresh mapping definitions based on current model structure
 							dex::GenerateDatasetMappings();
-							
 							sp_loc_fileName := "Results.xlsx";
 							
+							! Initialize the results file by copying an empty Excel template
 							FileCopy("empty.xlsx", sp_loc_fileName);
 							
-							! writing the output file locally
+							! Export model data to the local Excel file using the user-selected mapping
 							dex::WriteToFile(
 							    dataFile    :  sp_loc_fileName, 
-								mappingName :  ep_def_selectedMapping, 
-								pretty      :  1);
-							
+							    mappingName :  ep_def_selectedMapping, 
+							    pretty      :  1);
+							! Generate a cloud-compatible path for the web interface
 							sp_loc_IOPath := webui::GetIOFilePath(sp_loc_fileName);
 							
-							!this is required so it works on the cloud
+							! Stage the generated file to the IO path for cloud accessibility
 							FileCopy(sp_loc_fileName, sp_loc_IOPath);
 							
+							! Verify file creation and trigger the browser download
 							if FileExists(sp_loc_IOPath) then
 							    webui::RequestFileDownload(sp_loc_IOPath);
 							    webui::ShowMessage('info',"Export complete.");
-							
 							else
 							    webui::ShowMessage('error',"Something went wrong when creating the file.");
 							endif;
 						}
-						StringParameter sp_loc_fileName;
-						StringParameter sp_loc_IOPath;
+						StringParameter sp_loc_fileName {
+							Comment: "Result file name";
+						}
+						StringParameter sp_loc_IOPath {
+							Comment: "Result IO path";
+						}
 					}
 					DeclarationSection Export_Identifiers {
 						Index i_contractExport {
 							Range: s_contracts;
-							Comment: "Used to define column name in export process";
+							Comment: "Used to define column name in export process.";
 							dex::ColumnName: Contract;
 						}
 						Index i_producerExport {
 							Range: s_producers;
-							Comment: "Used to define column name in export process";
+							Comment: "Used to define column name in export process.";
 							dex::ColumnName: Producer;
 						}
 						Parameter p_generation {
 							IndexDomain: (i_producerExport, i_contractExport);
 							Unit: kg;
 							Definition: v_generation(i_producerExport, i_contractExport);
+							Comment: "Generation data for export.";
 							dex::ColumnName: Generation;
 							dex::Dataset: Export;
 							dex::TableName: Allocation per Producer;
@@ -572,6 +635,7 @@ Model Main_ContractAllocation {
 							IndexDomain: i_contractExport;
 							Unit: kg;
 							Definition: sum(i_producerExport, p_generation(i_producerExport, i_contractExport));
+							Comment: "Total generation for export.";
 							dex::ColumnName: Total Generation;
 							dex::Dataset: Export;
 							dex::TableName: Contract Allocation;
@@ -580,12 +644,13 @@ Model Main_ContractAllocation {
 							IndexDomain: (i_producer,i_contract);
 							Unit: $;
 							Definition: p_productionCost(i_producer,i_contract) * v_generation(i_producer,i_contract);
+							Comment: "Cost breakdown parameter.";
 						}
 					}
 					DeclarationSection Export_Dialog {
 						StringParameter sp_fileName {
 							Default: "Your File Name Here.xlsx";
-							Comment: "file name of exported data";
+							Comment: "File name of exported data.";
 						}
 						ElementParameter ep_def_selectedMapping {
 							Range: s_generatedMappings;
@@ -599,15 +664,21 @@ Model Main_ContractAllocation {
 								            WordOnly      :  0, 
 								            IgnoreWhite   :  0));
 							}
-							Comment: "selected generated mapping for export";
+							Comment: "Selected generated mapping for export.";
 						}
 						Set s_generatedMappings {
 							SubsetOf: dex::Mappings;
 							Index: i_generatedMappings;
 							Definition: {
-								{dex::map | FindString(dex::map, "Generated/",CaseSensitive :  1, WordOnly      :  0)}
+								{ dex::map |
+								    FindString(
+								        dex::map, 
+								        "Generated/",
+								        CaseSensitive :  1, 
+								        WordOnly      :  0)
+								}
 							}
-							Comment: "all generated selected mappings";
+							Comment: "All generated selected mappings.";
 						}
 					}
 				}
@@ -616,11 +687,13 @@ Model Main_ContractAllocation {
 		Section FlagsIdentifier {
 			StringParameter sp_readOnlyFlag {
 				Definition: "readonly";
+				Comment: "Global read-only flag.";
 			}
 		}
 	}
 	Procedure MainInitialization {
 		Body: {
+			! Automatically create or update DEX mappings based on the model's current identifiers
 			dex::GenerateDatasetMappings();
 		}
 	}
@@ -632,29 +705,39 @@ Model Main_ContractAllocation {
 	}
 	Procedure MainExecution {
 		Body: {
+			! Check if there is any production cost data available before solving
 			if sum((i_producer, i_contract), p_productionCost(i_producer, i_contract)) then
+			
+			    ! Check if the application is connected to an AIMMS PRO environment
 			    if pro::GetPROEndPoint() then
-				    if pro::management::IsRunningOnCloud() then
-					    pro::solverlease::solveModel(
-				            mathematicalProgrammingProblem :  'mp_contractAllocation', 
-				            jobDescription                 :  "Contract Allocation");
+			        ! If running on the Cloud, use the solver lease mechanism for remote execution
+			        if pro::management::IsRunningOnCloud() then
+			            pro::solverlease::solveModel(
+			                mathematicalProgrammingProblem :  'mp_contractAllocation', 
+			                jobDescription                 :  "Contract Allocation");
 			        endif;
 			    else
+			        ! Execute solve locally if not on PRO/Cloud
 			        solve mp_contractAllocation;
 			    endif;
+			
+			    ! Collect post-solve statistics and diagnostics
 			    pr_modelInformation;
+			
 			else 
+			    ! If no data exists, trigger a WebUI popup to alert the user
 			    webui::RequestPerformWebUIDialog(
 			        title   :  "Import First", 
 			        message :  "You are trying to solve without any data, please import first.", 
 			        actions :  s_loc_action,
-			        onDone  : 'webui::NoOp1');   
+			        onDone  : 'webui::NoOp1');
 			endif;
 		}
 		Set s_loc_action {
 			InitialData: {
 				{'ok'}
 			}
+			Comment: "Local UI action set";
 		}
 	}
 	Procedure PreMainTermination {
