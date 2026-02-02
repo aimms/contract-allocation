@@ -21,7 +21,7 @@ To get the most out of this model, we highly recommend reading our detailed step
 👉 **[Read the Full Article: Contract Allocation Guide](https://how-to.aimms.com/Articles/383/383-contract-allocation.html)**
 
 ### Prerequisites
-- **AIMMS:** You will need AIMMS installed to run the model. [Download the Free Academic Edition here](https://www.aimms.com/english/developers/downloads/free-academic-license/) if you are a student.
+- **AIMMS:** You will need AIMMS installed to run the model. [Download the Free Academic Edition here](https://www.aimms.com/support/licensing/) if you are a student.
 - **WebUI:** This model is optimized for the AIMMS WebUI for a modern, browser-based experience.
 
 ## 🚀 Getting Started
