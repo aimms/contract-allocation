@@ -1,7 +1,9 @@
 ## ams_version=1.0
 
 Model Main_ContractAllocation {
+	Comment: "Main model for contract allocation.";
 	Section Data_Model {
+		Comment: "Contains the main data model definitions.";
 		Section Quantities_and_Units {
 			Comment: {
 				"This section contains all the units and quantities that are added automatically by AIMMS.
@@ -27,11 +29,14 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Inputs {
+			Comment: "Input data section.";
 			Section Producers {
+				Comment: "Producer related definitions.";
 				Set s_producers {
 					Text: "The set of all producers";
 					Index: i_producer;
 					dex::FieldName: Producer;
+					Comment: "Set of all producers.";
 				}
 				Parameter p_availableCapacity {
 					IndexDomain: (i_producer);
@@ -53,6 +58,7 @@ Model Main_ContractAllocation {
 				}
 			}
 			Section Contracts {
+				Comment: "Contract definitions section.";
 				Set s_contracts {
 					Text: "The set of all contracts";
 					Index: i_contract, i_contract1;
@@ -88,6 +94,7 @@ Model Main_ContractAllocation {
 				}
 			}
 			DeclarationSection Production_Cost {
+				Comment: "Production cost parameters section.";
 				Parameter p_productionCost {
 					IndexDomain: (i_producer,i_contract);
 					Text: "Unit cost for delivery by producer p for contract c";
@@ -99,6 +106,7 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Math_Model {
+			Comment: "Mathematical programming model.";
 			Variable v_totalCost {
 				Text: "Total cost of all deliveries";
 				Unit: $;
@@ -183,6 +191,7 @@ Model Main_ContractAllocation {
 				Comment: "Mathematical program definition.";
 			}
 			DeclarationSection Model_Information {
+				Comment: "Model statistics and solution states.";
 				ElementParameter ep_programStatus {
 					Range: AllSolutionStates;
 					Comment: "Solver status.";
@@ -209,6 +218,7 @@ Model Main_ContractAllocation {
 				}
 			}
 			Procedure pr_modelInformation {
+				Comment: "Collects model execution statistics.";
 				Body: {
 					! Clear previous model metadata
 					empty Model_Information;
@@ -223,6 +233,7 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Outputs {
+			Comment: "Calculations and definitions for output parameters.";
 			Parameter p_def_actualnumberOfContributors {
 				IndexDomain: i_contract;
 				Definition: sum(i_producer | v_generation(i_producer, i_contract), 1);
@@ -292,7 +303,13 @@ Model Main_ContractAllocation {
 		}
 	}
 	Section UI_Declarations {
-		Procedure pr_empty;
+		Comment: "User interface specific identifiers and procedures.";
+		Procedure pr_empty {
+			Body: {
+				! Empty procedure definition.
+			}
+			Comment: "An empty procedure for UI elements requiring one.";
+		}
 		StringParameter sp_logo {
 			Definition: "aimms_logo.png";
 			Comment: "UI logo path.";
@@ -310,6 +327,7 @@ Model Main_ContractAllocation {
 			Comment: "Selected contract pointer.";
 		}
 		Section Workflow {
+			Comment: "WebUI workflow configurations.";
 			StringParameter sp_myWorkflows {
 				IndexDomain: (webui::indexWorkflowOrder,webui::indexWorkflowSpec);
 				Comment: "Workflow configuration.";
@@ -337,8 +355,11 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section Pages {
+			Comment: "WebUI pages layout and styling parameters.";
 			Section Input_Page {
+				Comment: "Configurations specific to the Input page.";
 				DeclarationSection Input_Annotations {
+					Comment: "Cell coloring and annotations for input parameters.";
 					StringParameter sp_minimalNumberofContributorsAnnotation {
 						IndexDomain: i_contract;
 						Definition: {
@@ -431,6 +452,7 @@ Model Main_ContractAllocation {
 					}
 				}
 				DeclarationSection Input_PageAction {
+					Comment: "Page actions available on the input page.";
 					StringParameter sp_inputSecondaryActions {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: {
@@ -450,7 +472,9 @@ Model Main_ContractAllocation {
 					}
 				}
 				Section Import {
+					Comment: "Data import specific procedures and definitions.";
 					Procedure pr_requestTemplate {
+						Comment: "Requests download of the empty template.";
 						Body: {
 							! Set the template filename and retrieve the necessary cloud-compatible path
 							sp_loc_fileName := "ContractAllocationTemplate.xlsx";
@@ -473,11 +497,14 @@ Model Main_ContractAllocation {
 						}
 					}
 					Procedure pr_requestCustomExcel {
+						Comment: "Requests a custom Excel file via UI popup.";
 						Body: {
+							! Open the file upload dialog and call pr_uploadFile upon finish.
 							webui::RequestFileUpload(onDone :  'pr_uploadFile');
 						}
 					}
 					Procedure pr_uploadFile {
+						Comment: "Processes the uploaded file and loads mapping.";
 						Arguments: (fname,StatusCode,StatusDescription);
 						Body: {
 							block ! Process custom Excel file import
@@ -536,6 +563,7 @@ Model Main_ContractAllocation {
 						}
 					}
 					Procedure pr_importDefaultExcel {
+						Comment: "Imports the default data package.";
 						Body: {
 							! Register the mapping definition for the initial input data
 							dex::AddMapping(
@@ -557,7 +585,9 @@ Model Main_ContractAllocation {
 				}
 			}
 			Section Results_Page {
+				Comment: "Configurations for the Results page.";
 				DeclarationSection Result_Side_Panel {
+					Comment: "Result side panel components.";
 					StringParameter sp_resultsSidePanel {
 						IndexDomain: (webui::indexPageExtension,webui::indexSidePanelSpec);
 						Definition: {
@@ -569,6 +599,7 @@ Model Main_ContractAllocation {
 					}
 				}
 				DeclarationSection Results_PageAction {
+					Comment: "Actions available on the results page.";
 					StringParameter sp_resultsSecondaryActions {
 						IndexDomain: (webui::indexPageExtension,webui::indexPageActionSpec);
 						Definition: sp_inputSecondaryActions(webui::indexPageExtension, webui::indexPageActionSpec);
@@ -576,7 +607,9 @@ Model Main_ContractAllocation {
 					}
 				}
 				Section Export {
+					Comment: "Export functionality for results generation.";
 					Procedure pr_requestResults {
+						Comment: "Requests download of the generated results.";
 						Body: {
 							! Automatically refresh mapping definitions based on current model structure
 							dex::GenerateDatasetMappings();
@@ -612,6 +645,7 @@ Model Main_ContractAllocation {
 						}
 					}
 					DeclarationSection Export_Identifiers {
+						Comment: "Identifiers mapped for the export process.";
 						Index i_contractExport {
 							Range: s_contracts;
 							Comment: "Used to define column name in export process.";
@@ -648,6 +682,7 @@ Model Main_ContractAllocation {
 						}
 					}
 					DeclarationSection Export_Dialog {
+						Comment: "Dialog parameters for the export functionality.";
 						StringParameter sp_fileName {
 							Default: "Your File Name Here.xlsx";
 							Comment: "File name of exported data.";
@@ -685,6 +720,7 @@ Model Main_ContractAllocation {
 			}
 		}
 		Section FlagsIdentifier {
+			Comment: "Configuration of UI flags.";
 			StringParameter sp_readOnlyFlag {
 				Definition: "readonly";
 				Comment: "Global read-only flag.";
@@ -692,18 +728,23 @@ Model Main_ContractAllocation {
 		}
 	}
 	Procedure MainInitialization {
+		Comment: "Initialization routine called at model startup.";
 		Body: {
 			! Automatically create or update DEX mappings based on the model's current identifiers
 			dex::GenerateDatasetMappings();
 		}
 	}
 	Procedure PostMainInitialization {
+		Body: {
+			! Executes operations after main initialization.
+		}
 		Comment: {
 			"Add initialization statements here that require that the libraries are already initialized properly,
 			or add statements that require the Data Management module to be initialized."
 		}
 	}
 	Procedure MainExecution {
+		Comment: "Model execution procedure.";
 		Body: {
 			! Check if there is any production cost data available before solving
 			if sum((i_producer, i_contract), p_productionCost(i_producer, i_contract)) then
@@ -742,6 +783,7 @@ Model Main_ContractAllocation {
 	}
 	Procedure PreMainTermination {
 		Body: {
+			! Checks prerequisites before system termination.
 			return DataManagementExit();
 		}
 		Comment: {
@@ -752,6 +794,7 @@ Model Main_ContractAllocation {
 	}
 	Procedure MainTermination {
 		Body: {
+			! Returns 1 to signify successful termination sequence processing
 			return 1;
 		}
 		Comment: {
