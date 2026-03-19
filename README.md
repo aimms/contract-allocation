@@ -1,4 +1,4 @@
-# Contract Allocation
+# Contract Allocation 
 
 [![Downloads](https://img.shields.io/github/downloads/aimms/contract-allocation/total?style=for-the-badge&logo=github&labelColor=000081&color=1847c9)](https://github.com/aimms/contract-allocation/releases)
 ![AIMMS Version](https://img.shields.io/badge/AIMMS-25.9-white?style=for-the-badge&labelColor=009B00&color=00D400)

@@ -1,0 +1,192 @@
+stages:
+  - notify
+  - update-docs
+  - release
+
+# ─────────────────────────────────────────
+# 1. Adiciona você como reviewer em todo MR aberto para master
+# ─────────────────────────────────────────
+add-reviewer:
+  stage: notify
+  image: alpine:latest
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "master"'
+  script:
+    - apk add --no-cache curl
+    - |
+      curl --silent --fail \
+        -X PUT \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        -H "Content-Type: application/json" \
+        "https://gitlab.aimms.com/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID" \
+        -d '{"reviewer_ids": [162]}'
+
+# ─────────────────────────────────────────
+# 2a. Atualiza badges no README (push de tag)
+# ─────────────────────────────────────────
+update-readme:
+  stage: update-docs
+  image: alpine:latest
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - apk add --no-cache git libxml2-utils
+    - |
+      git config --global user.email "ci-bot@gitlab.com"
+      git config --global user.name "CI Bot"
+      git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+
+      TAG=$CI_COMMIT_TAG
+      AIMMS_FILE=$(find . -maxdepth 1 -name "*.aimms" | head -n1)
+      AIMMS_VERSION=$(xmllint --xpath 'string(/References/@AIMMS_Version)' "$AIMMS_FILE" | grep -oE '^[0-9]+\.[0-9]+')
+      WEBUI_VERSION=$(xmllint --xpath 'string(/References/RepositoryLibrary[@Name="WebUI"]/@Version)' "$AIMMS_FILE")
+      DEX_VERSION=$(xmllint --xpath 'string(/References/RepositoryLibrary[@Name="AimmsDEX"]/@Version)' "$AIMMS_FILE")
+
+      echo "AIMMS: $AIMMS_VERSION | WebUI: $WEBUI_VERSION | AimmsDEX: $DEX_VERSION"
+
+      sed -i "s|AIMMS-[0-9.]*-white|AIMMS-${AIMMS_VERSION}-white|g" README.md
+      sed -i "s|WebUI-[0-9.]*-white|WebUI-${WEBUI_VERSION}-white|g" README.md
+      sed -i "s|AimmsDEX-[0-9.]*-white|AimmsDEX-${DEX_VERSION}-white|g" README.md
+
+      git add README.md
+      git commit -m "chore: update README badges for $TAG [skip ci]"
+      git push origin HEAD:master
+
+# ─────────────────────────────────────────
+# 2b. Cria MR no repo do .rst (somente quando merge for aceito na master)
+# ─────────────────────────────────────────
+update-howto:
+  stage: update-docs
+  image: python:3.11-alpine
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "master" && $CI_COMMIT_MESSAGE !~ /\[skip ci\]/'
+  script:
+    - apk add --no-cache git curl
+    - |
+      git config --global user.email "ci-bot@gitlab.com"
+      git config --global user.name "CI Bot"
+
+      TAG=$(git tag --sort=-version:refname | head -n1)
+      if [ -z "$TAG" ]; then
+        echo "Nenhuma tag encontrada, pulando."
+        exit 0
+      fi
+
+      TODAY=$(date +"%d/%m/%Y")
+      REPO_NAME=$(basename "$CI_PROJECT_URL")
+
+      PREV_TAG=$(git tag --sort=-version:refname | sed -n '2p')
+      if [ -n "$PREV_TAG" ]; then
+        COMMITS=$(git log "${PREV_TAG}..${TAG}" --pretty=format:"%s" --no-merges)
+      else
+        COMMITS=$(git log "${TAG}" --pretty=format:"%s" --no-merges)
+      fi
+      COMMIT_LINE=$(echo "$COMMITS" | tr '\n' ';' | sed 's/;$//' | sed 's/;/. /g')
+
+      HOW_TO_REPO="gitlab.aimms.com/aimms/doc/aimms-how-to.git"
+      git clone "https://oauth2:${GITLAB_TOKEN}@${HOW_TO_REPO}" how-to-repo
+      cd how-to-repo
+
+      RST_FILE=$(find . -name "${REPO_NAME}.rst" | head -n1)
+      if [ -z "$RST_FILE" ]; then
+        RST_FILE=$(grep -rl "Release Notes" --include="*.rst" . | head -n1)
+      fi
+      echo "RST file: $RST_FILE"
+
+      GITHUB_RELEASE_URL="https://github.com/${GITHUB_ORG}/${REPO_NAME}/releases/download/${TAG}/${REPO_NAME}.zip"
+      export RST_FILE TAG TODAY COMMIT_LINE GITHUB_RELEASE_URL
+
+      echo "import os, sys" > update_rst.py
+      echo "rst_file = os.environ['RST_FILE']" >> update_rst.py
+      echo "tag = os.environ['TAG']" >> update_rst.py
+      echo "today = os.environ['TODAY']" >> update_rst.py
+      echo "commit_line = os.environ['COMMIT_LINE']" >> update_rst.py
+      echo "url = os.environ['GITHUB_RELEASE_URL']" >> update_rst.py
+      echo "new_entry = '\`v' + tag + ' <' + url + '>\`_ (' + today + ')\n   ' + commit_line + '.\n'" >> update_rst.py
+      echo "f = open(rst_file, 'r'); content = f.read(); f.close()" >> update_rst.py
+      echo "sep = '--------------------'" >> update_rst.py
+      echo "pos = content.find(sep)" >> update_rst.py
+      echo "if pos == -1: print('ERROR: separator not found'); sys.exit(1)" >> update_rst.py
+      echo "pos = content.find('\n', pos) + 1" >> update_rst.py
+      echo "content = content[:pos] + '\n' + new_entry + content[pos:]" >> update_rst.py
+      echo "f = open(rst_file, 'w'); f.write(content); f.close()" >> update_rst.py
+      echo "print('RST updated successfully.')" >> update_rst.py
+
+      python3 update_rst.py
+
+      python3 update_rst.py
+
+      BRANCH="update-changelog-${REPO_NAME}-${TAG}"
+      git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${HOW_TO_REPO}"
+      git checkout -b "$BRANCH"
+      git add "$RST_FILE"
+      git commit -m "chore: add changelog entry for ${REPO_NAME} $TAG"
+      git push origin "$BRANCH"
+
+      HOW_TO_PROJECT_ID=$(curl --silent \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        "https://gitlab.aimms.com/api/v4/projects/aimms%2Fdoc%2Faimms-how-to" \
+        | grep -o '"id":[0-9]*' | head -n1 | cut -d':' -f2)
+
+      curl --silent --fail \
+        -X POST \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        -H "Content-Type: application/json" \
+        "https://gitlab.aimms.com/api/v4/projects/${HOW_TO_PROJECT_ID}/merge_requests" \
+        -d "{
+          \"source_branch\": \"$BRANCH\",
+          \"target_branch\": \"master\",
+          \"title\": \"chore: add changelog entry for ${REPO_NAME} $TAG\",
+          \"description\": \"Automated changelog update generated by CI pipeline.\n\nProject: ${REPO_NAME}\nTag: ${TAG}\nDate: ${TODAY}\",
+          \"reviewer_ids\": [162]
+        }"
+
+# ─────────────────────────────────────────
+# 3. Cria release no GitHub com zip
+# ─────────────────────────────────────────
+github-release:
+  stage: release
+  image: alpine:latest
+  rules:
+    - if: '$CI_COMMIT_TAG'
+  script:
+    - apk add --no-cache curl git zip
+    - |
+      TAG=$CI_COMMIT_TAG
+      REPO_NAME=$(basename "$CI_PROJECT_URL")
+      REPO="$GITHUB_ORG/$REPO_NAME"
+
+      PREV_TAG=$(git tag --sort=-version:refname | sed -n '2p')
+      if [ -n "$PREV_TAG" ]; then
+        CHANGELOG=$(git log "${PREV_TAG}..${TAG}" --pretty=format:"- %s" --no-merges)
+      else
+        CHANGELOG=$(git log "${TAG}" --pretty=format:"- %s" --no-merges)
+      fi
+
+      ZIP_NAME="${REPO_NAME}.zip"
+      zip -r "$ZIP_NAME" . --exclude ".git/*"
+
+      RELEASE_RESPONSE=$(curl --silent --fail \
+        -X POST \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Content-Type: application/json" \
+        "https://api.github.com/repos/$REPO/releases" \
+        -d "{
+          \"tag_name\": \"$TAG\",
+          \"name\": \"Release $TAG\",
+          \"body\": \"$(echo "$CHANGELOG" | sed 's/"/\\"/g' | awk '{printf "%s\\n", $0}')\",
+          \"draft\": false,
+          \"prerelease\": false
+        }")
+
+      UPLOAD_URL=$(echo "$RELEASE_RESPONSE" \
+        | grep -o '"upload_url":"[^"]*"' \
+        | cut -d'"' -f4 \
+        | sed 's/{?name,label}//')
+
+      curl --silent --fail \
+        -X POST \
+        -H "Authorization: token $GITHUB_TOKEN" \
+        -H "Content-Type: application/zip" \
+        --data-binary @"$ZIP_NAME" \
+        "${UPLOAD_URL}?name=${ZIP_NAME}"
