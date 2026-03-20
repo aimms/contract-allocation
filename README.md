@@ -16,7 +16,7 @@ In complex supply chains, managing multiple procurement contracts with different
 
 ## 📖 How to Use This Example
 
-To get the most out of this model, we highly recommend reading our detailed step-by-step guide on the AIMMS How-To website:
+To get the most out of this model, we highly recommend reading our detailed step-by-step guide on the AIMMS How-To website: 
 
 👉 **[Read the Full Article: Contract Allocation Guide](https://how-to.aimms.com/Articles/383/383-contract-allocation.html)**
 
