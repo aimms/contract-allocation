@@ -3,9 +3,34 @@
     - k8s-basic
   image: "${DOCKER_ACCESS_URL}/other/dockerdev/documentation:latest"
 
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == "main"'
+
 stages:
+  - notify
   - update-docs
   - release
+
+# ─────────────────────────────────────────
+# 1. Add yourself as reviewer on every MR targeting main
+# ─────────────────────────────────────────
+add-reviewer:
+  <<: *k8s_basic_job
+  stage: notify
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event" && $CI_MERGE_REQUEST_TARGET_BRANCH_NAME == "main"'
+  script:
+    - |
+      export HOME=/tmp
+      curl --silent --fail \
+        -X PUT \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        -H "Content-Type: application/json" \
+        "https://gitlab.aimms.com/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID" \
+        -d '{"reviewer_ids": [162]}'
 
 # ─────────────────────────────────────────
 # 2a. Update README badges (on tag push)
