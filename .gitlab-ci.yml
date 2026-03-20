@@ -151,18 +151,11 @@ update-howto:
       fi
       echo "RST file: $RST_FILE"
 
-      # Set up environment for Python script
-      GITHUB_RELEASE_URL="https://github.com/${GITHUB_ORG}/${REPO_NAME}/releases/download/${TAG}/${REPO_NAME}.zip"
-      export RST_FILE TAG TODAY COMMIT_LINE GITHUB_RELEASE_URL
-
-      # Run the update script from the original repo
-      python3 "${CI_PROJECT_DIR}/scripts/update_rst.py"
-
       # Create branch with unique name (includes tag)
       RST_BASENAME=$(basename "$RST_FILE" .rst)
       BRANCH="project-release/${RST_BASENAME}-${TAG}"
 
-      # Check if branch already exists
+      # Check if branch already exists, checkout before modifying files
       git fetch origin
       if git rev-parse --verify "origin/$BRANCH" >/dev/null 2>&1; then
         echo "Branch $BRANCH already exists, checking out"
@@ -170,6 +163,13 @@ update-howto:
       else
         git checkout -b "$BRANCH"
       fi
+
+      # Set up environment for Python script
+      GITHUB_RELEASE_URL="https://github.com/${GITHUB_ORG}/${REPO_NAME}/releases/download/${TAG}/${REPO_NAME}.zip"
+      export RST_FILE TAG TODAY COMMIT_LINE GITHUB_RELEASE_URL
+
+      # Run the update script from the original repo
+      python3 "${CI_PROJECT_DIR}/scripts/update_rst.py"
 
       git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${HOW_TO_REPO}"
       git add "$RST_FILE"
