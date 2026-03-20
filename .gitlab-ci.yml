@@ -112,16 +112,11 @@ update-howto:
   <<: *k8s_basic_job
   stage: update-docs
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == "main" && $CI_COMMIT_MESSAGE !~ /\[skip ci\]/'
+    - if: '$CI_COMMIT_TAG'
   script:
     - *git_setup
     - |
-      TAG=$(git tag --sort=-version:refname | head -n1)
-      if [ -z "$TAG" ]; then
-        echo "No tag found, skipping."
-        exit 0
-      fi
-
+      TAG=$CI_COMMIT_TAG
       TODAY=$(date +"%d/%m/%Y")
       REPO_NAME="${CI_PROJECT_NAME}"
 
