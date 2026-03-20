@@ -40,6 +40,12 @@ add-reviewer:
   script:
     - export HOME=/tmp
     - |
+      if [ -z "$GITLAB_TOKEN" ]; then
+        echo "ERROR: GITLAB_TOKEN is not available."
+        echo "This variable must be set in CI/CD settings and NOT marked as 'Protected'"
+        echo "(Protected variables are only available on protected branches, not MR pipelines)"
+        exit 1
+      fi
       curl --fail \
         -X PUT \
         -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
@@ -57,7 +63,7 @@ update-readme:
     - if: '$CI_COMMIT_TAG'
   script:
     - *git_setup
-    - git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+    - git remote set-url origin "${CI_REPOSITORY_URL}"
     - |
       TAG=$CI_COMMIT_TAG
 
@@ -173,9 +179,9 @@ update-howto:
       }
       git push origin "$BRANCH"
 
-      # Get project ID using jq for reliable JSON parsing
+      # Get project ID using jq for reliable JSON parsing (uses CI_JOB_TOKEN for read)
       HOW_TO_PROJECT_ID=$(curl --silent --fail \
-        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        -H "JOB-TOKEN: $CI_JOB_TOKEN" \
         "https://gitlab.aimms.com/api/v4/projects/aimms%2Fdoc%2Faimms-how-to" \
         | jq -r '.id')
 
@@ -184,9 +190,9 @@ update-howto:
         exit 1
       fi
 
-      # Check if MR already exists
+      # Check if MR already exists (uses CI_JOB_TOKEN for read)
       EXISTING_MR=$(curl --silent --fail \
-        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
+        -H "JOB-TOKEN: $CI_JOB_TOKEN" \
         "https://gitlab.aimms.com/api/v4/projects/${HOW_TO_PROJECT_ID}/merge_requests?source_branch=${BRANCH}&state=opened" \
         | jq '. | length')
 
