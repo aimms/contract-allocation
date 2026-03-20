@@ -25,7 +25,7 @@ add-reviewer:
   script:
     - |
       export HOME=/tmp
-      curl --silent --fail \
+      curl --fail \
         -X PUT \
         -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
         -H "Content-Type: application/json" \
