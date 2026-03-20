@@ -96,17 +96,23 @@ update-howto:
       echo "url = os.environ['GITHUB_RELEASE_URL']" >> update_rst.py
       echo "new_entry = '\`v' + tag + ' <' + url + '>\`_ (' + today + ')\n   ' + commit_line + '.\n'" >> update_rst.py
       echo "f = open(rst_file, 'r'); content = f.read(); f.close()" >> update_rst.py
-      echo "sep = '--------------------'" >> update_rst.py
-      echo "pos = content.find(sep)" >> update_rst.py
-      echo "if pos == -1: print('ERROR: separator not found'); sys.exit(1)" >> update_rst.py
-      echo "pos = content.find('\n', pos) + 1" >> update_rst.py
-      echo "content = content[:pos] + '\n' + new_entry + content[pos:]" >> update_rst.py
-      echo "f = open(rst_file, 'w'); f.write(content); f.close()" >> update_rst.py
+      echo "lines = content.splitlines(keepends=True)" >> update_rst.py
+      echo "insert_pos = -1" >> update_rst.py
+      echo "found_release_notes = False" >> update_rst.py
+      echo "for i, line in enumerate(lines):" >> update_rst.py
+      echo "    if line.strip() == 'Release Notes': found_release_notes = True" >> update_rst.py
+      echo "    if found_release_notes and '----' in line:" >> update_rst.py
+      echo "        insert_pos = i + 1" >> update_rst.py
+      echo "        break" >> update_rst.py
+      echo "if insert_pos == -1: print('ERROR: Release Notes section not found'); sys.exit(1)" >> update_rst.py
+      echo "lines.insert(insert_pos, '\n' + new_entry)" >> update_rst.py
+      echo "f = open(rst_file, 'w'); f.write(''.join(lines)); f.close()" >> update_rst.py
       echo "print('RST updated successfully.')" >> update_rst.py
 
       python3 update_rst.py
 
-      BRANCH="update-changelog-${REPO_NAME}-${TAG}"
+      RST_BASENAME=$(basename "$RST_FILE" .rst)
+      BRANCH="project-release/${RST_BASENAME}"
       git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${HOW_TO_REPO}"
       git checkout -b "$BRANCH"
       git add "$RST_FILE"
