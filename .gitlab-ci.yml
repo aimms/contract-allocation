@@ -96,8 +96,8 @@ update-readme:
 
       # Update badges
       sed -i "s|AIMMS-[0-9.]*-white|AIMMS-${AIMMS_VERSION}-white|g" README.md
-      [ -n "$WEBUI_VERSION" ] && sed -i "s|WebUI-[0-9.]*-white|WebUI-${WEBUI_VERSION}-white|g" README.md
-      [ -n "$DEX_VERSION" ] && sed -i "s|AimmsDEX-[0-9.]*-white|AimmsDEX-${DEX_VERSION}-white|g" README.md
+      [ -n "$WEBUI_VERSION" ] && sed -i "s|WebUI-[0-9.]*-white|WebUI-${WEBUI_VERSION}-white|g" README.md || true
+      [ -n "$DEX_VERSION" ] && sed -i "s|AimmsDEX-[0-9.]*-white|AimmsDEX-${DEX_VERSION}-white|g" README.md || true
 
       # Commit only if there are changes
       git add README.md
@@ -181,22 +181,22 @@ update-howto:
       }
       git push origin "$BRANCH"
 
-      # Get project ID (uses CI_JOB_TOKEN for read)
-      HOW_TO_PROJECT_ID=$(curl --silent --fail \
-        -H "JOB-TOKEN: $CI_JOB_TOKEN" \
+      # Get project ID
+      HOW_TO_PROJECT_ID=$(curl --silent \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
         "https://gitlab.aimms.com/api/v4/projects/aimms%2Fdoc%2Faimms-how-to" \
-        | grep -o '"id":[0-9]*' | head -n1 | cut -d':' -f2)
+        | grep -o '"id":[0-9]*' | head -n1 | cut -d':' -f2 || true)
 
       if [ -z "$HOW_TO_PROJECT_ID" ] || [ "$HOW_TO_PROJECT_ID" = "null" ]; then
         echo "ERROR: Could not get how-to project ID"
         exit 1
       fi
 
-      # Check if MR already exists (uses CI_JOB_TOKEN for read)
-      EXISTING_MR=$(curl --silent --fail \
-        -H "JOB-TOKEN: $CI_JOB_TOKEN" \
+      # Check if MR already exists
+      EXISTING_MR=$(curl --silent \
+        -H "PRIVATE-TOKEN: $GITLAB_TOKEN" \
         "https://gitlab.aimms.com/api/v4/projects/${HOW_TO_PROJECT_ID}/merge_requests?source_branch=${BRANCH}&state=opened" \
-        | grep -o '"iid":[0-9]*' | wc -l)
+        | grep -o '"iid":[0-9]*' | wc -l || true)
 
       if [ "$EXISTING_MR" -gt 0 ]; then
         echo "MR already exists for branch $BRANCH, skipping"
@@ -231,6 +231,7 @@ github-release:
       TAG=$CI_COMMIT_TAG
       REPO_NAME="${CI_PROJECT_NAME}"
       REPO="$GITHUB_ORG/$REPO_NAME"
+      export TAG REPO_NAME
 
       # Generate changelog
       PREV_TAG=$(git tag --sort=-version:refname | sed -n '2p')
@@ -254,7 +255,7 @@ github-release:
         "https://api.github.com/repos/$REPO/releases" \
         -d "$RELEASE_DATA")
 
-      UPLOAD_URL=$(echo "$RELEASE_RESPONSE" | grep -o '"upload_url":"[^"]*"' | cut -d'"' -f4 | sed 's/{?name,label}//')
+      UPLOAD_URL=$(echo "$RELEASE_RESPONSE" | grep -o '"upload_url":[[:space:]]*"[^"]*"' | grep -o '"https://[^"]*"' | tr -d '"' | sed 's/{?name,label}//' || true)
 
       if [ -z "$UPLOAD_URL" ] || [ "$UPLOAD_URL" = "null" ]; then
         echo "ERROR: Could not get upload URL from release response"
