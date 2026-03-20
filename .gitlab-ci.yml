@@ -1,12 +1,23 @@
+.k8s_basic_job: &k8s_basic_job
+  tags:
+    - k8s-basic
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
+    - if: '$CI_COMMIT_TAG'
+    - if: '$CI_COMMIT_BRANCH == "master"'
+
 stages:
   - notify
   - update-docs
   - release
 
 # ─────────────────────────────────────────
-# 1. Adiciona você como reviewer em todo MR aberto para master
+# 1. Add yourself as reviewer on every MR targeting master
 # ─────────────────────────────────────────
 add-reviewer:
+  <<: *k8s_basic_job
   stage: notify
   image: alpine:latest
   rules:
@@ -22,9 +33,10 @@ add-reviewer:
         -d '{"reviewer_ids": [162]}'
 
 # ─────────────────────────────────────────
-# 2a. Atualiza badges no README (push de tag)
+# 2a. Update README badges (on tag push)
 # ─────────────────────────────────────────
 update-readme:
+  <<: *k8s_basic_job
   stage: update-docs
   image: alpine:latest
   rules:
@@ -53,9 +65,10 @@ update-readme:
       git push origin HEAD:master
 
 # ─────────────────────────────────────────
-# 2b. Cria MR no repo do .rst (somente quando merge for aceito na master)
+# 2b. Create MR in .rst repo (only when MR is merged into master)
 # ─────────────────────────────────────────
 update-howto:
+  <<: *k8s_basic_job
   stage: update-docs
   image: python:3.11-alpine
   rules:
@@ -114,8 +127,6 @@ update-howto:
 
       python3 update_rst.py
 
-      python3 update_rst.py
-
       BRANCH="update-changelog-${REPO_NAME}-${TAG}"
       git remote set-url origin "https://oauth2:${GITLAB_TOKEN}@${HOW_TO_REPO}"
       git checkout -b "$BRANCH"
@@ -142,9 +153,10 @@ update-howto:
         }"
 
 # ─────────────────────────────────────────
-# 3. Cria release no GitHub com zip
+# 3. Create GitHub release with zip
 # ─────────────────────────────────────────
 github-release:
+  <<: *k8s_basic_job
   stage: release
   image: alpine:latest
   rules:
