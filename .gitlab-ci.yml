@@ -14,7 +14,7 @@ stages:
   - release
 
 # ─────────────────────────────────────────
-# 1. Adiciona você como reviewer em todo MR aberto para master
+# 1. Add yourself as reviewer on every MR targeting master
 # ─────────────────────────────────────────
 add-reviewer:
   <<: *k8s_basic_job
@@ -33,7 +33,7 @@ add-reviewer:
         -d '{"reviewer_ids": [162]}'
 
 # ─────────────────────────────────────────
-# 2a. Atualiza badges no README (push de tag)
+# 2a. Update README badges (on tag push)
 # ─────────────────────────────────────────
 update-readme:
   <<: *k8s_basic_job
@@ -65,7 +65,7 @@ update-readme:
       git push origin HEAD:main
 
 # ─────────────────────────────────────────
-# 2b. Cria MR no repo do .rst (somente quando merge for aceito na master)
+# 2b. Create MR in .rst repo (only when MR is merged into master)
 # ─────────────────────────────────────────
 update-howto:
   <<: *k8s_basic_job
@@ -153,11 +153,12 @@ update-howto:
         }"
 
 # ─────────────────────────────────────────
-# 3. Cria release no GitHub com zip
+# 3. Create GitHub release with zip
 # ─────────────────────────────────────────
 github-release:
-  stage: release
   <<: *k8s_basic_job
+  stage: release
+  image: alpine:latest
   rules:
     - if: '$CI_COMMIT_TAG'
   script:
