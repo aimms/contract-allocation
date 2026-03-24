@@ -119,7 +119,13 @@ update-readme:
       fi
 
 # ─────────────────────────────────────────
-# 2b. Create MR in how-to repo (on push to main)
+# 2b. Create MR in how-to repo (on tag push)
+#
+# Requires CI/CD variable RST_ARTICLE_ID set per project
+# (e.g. RST_ARTICLE_ID=383). This is used to locate the
+# correct .rst file in the how-to repo and avoids matching
+# the wrong article when the repo name differs from the
+# article filename.
 # ─────────────────────────────────────────
 update-howto:
   <<: *k8s_basic_job
@@ -132,6 +138,14 @@ update-howto:
       TAG=$CI_COMMIT_TAG
       TODAY=$(date +"%d/%m/%Y")
       REPO_NAME="${CI_PROJECT_NAME}"
+
+      # Validate RST_ARTICLE_ID
+      if [ -z "$RST_ARTICLE_ID" ]; then
+        echo "ERROR: RST_ARTICLE_ID is not set."
+        echo "Add it as a CI/CD variable in Settings > CI/CD > Variables"
+        echo "It should be the article number in the how-to repo (e.g. 383)"
+        exit 1
+      fi
 
       # Generate changelog
       PREV_TAG=$(git tag --sort=-version:refname | sed -n '2p')
@@ -148,13 +162,11 @@ update-howto:
       git clone "https://oauth2:${GITLAB_TOKEN}@${HOW_TO_REPO}" how-to-repo
       cd how-to-repo
 
-      # Find RST file
-      RST_FILE=$(find . -name "${REPO_NAME}.rst" | head -n1)
+      # Find RST file using the article ID
+      RST_FILE=$(find . -path "./Articles/${RST_ARTICLE_ID}/*.rst" | head -n1)
       if [ -z "$RST_FILE" ]; then
-        RST_FILE=$(grep -rl "Release Notes" --include="*.rst" . | head -n1)
-      fi
-      if [ -z "$RST_FILE" ]; then
-        echo "ERROR: Could not find RST file for ${REPO_NAME}"
+        echo "ERROR: No .rst file found in Articles/${RST_ARTICLE_ID}/"
+        echo "Check that RST_ARTICLE_ID=$RST_ARTICLE_ID is correct"
         exit 1
       fi
       echo "RST file: $RST_FILE"
