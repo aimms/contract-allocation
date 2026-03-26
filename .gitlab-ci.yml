@@ -1,4 +1,4 @@
 include:
   - project: 'aimms/user-support/templates/template-cicd'
     ref: main
-    file: '.gitlab-ci-howto-projects.yml'
+    file: '.gitlab-ci-examples.yml'
