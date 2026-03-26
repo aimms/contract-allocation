@@ -7,7 +7,7 @@
  
 This repository contains a functional AIMMS example model for **Contract Allocation**. It demonstrates how to optimize the distribution of demand across various supply contracts while minimizing costs and satisfying business constraints.
 
-## 🎯 Business Problem 
+## 🎯 Business Problem  
 
 In complex supply chains, managing multiple procurement contracts with different pricing tiers, minimum/maximum commitments, and geographical constraints is a challenge. This model helps decision-makers:
 - Minimize total procurement costs.
